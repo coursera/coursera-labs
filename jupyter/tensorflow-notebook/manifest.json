@@ -1,0 +1,9 @@
+{
+  "name": "coursera/tensorflow-notebook",
+  "httpPort": 8888,
+  "mounts": [
+    {
+      "path": "/home/jovyan/work"
+    }
+  ]
+}

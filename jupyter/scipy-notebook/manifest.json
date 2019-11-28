@@ -1,0 +1,9 @@
+{
+  "name": "coursera/scipy-notebook",
+  "httpPort": 8888,
+  "mounts": [
+    {
+      "path": "/home/jovyan/work"
+    }
+  ]
+}
