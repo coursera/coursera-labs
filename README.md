@@ -2,10 +2,32 @@
 
 ### Quick Start
 
-Install [Docker](https://docs.docker.com) before you get started. `run-lab/coursera-lab.py` is a 
-Docker client wrapper for Coursera Labs. This script simulates Coursera build and run 
-procedures configured by the `manifest.json` file.
+1. **Install [Docker](https://docs.docker.com)** if not installed already
+2. **Build run-lab image**
+    ```
+    docker build -t run-lab -f run-lab/Dockerfile .
+    ```
+    run-lab image is a dockerized version of `run-lab/coursera-lab.py` script. `run-lab/coursera-lab.py` script simulates Coursera Labs docker build and run procedures.
+3. **Create a folder with your custom image files and `manifest.json`**
+    We strongly recommend to use our example images `jupyter/datascience-notebook`, `jupyter/scipy-notebook` or `jupyter/tensorflow-notebook` as a base of your image. 
+    Coursera labs script uses `manifest.json` to read configurations specific to your image. Details about `manifest.json` can be found [here](#manifest.json)
+4. **Build and Test your custom image locally**
+    Build jupyter notebook image
+    ```
+    ./run-lab/run.sh build <path to image folder> --add-submit-button
+    ```
+    Build image of application other than jupyter notebook
+    ```
+    ./run-lab/run.sh build <path to image folder>
+    ```
+    Run an instance of the built custom image
+    ```
+    ./run-lab/run.sh run <image name>
+    ```
+    If you see a message like `Tell me which volumes to mount for the following container volumes`, enter the local machine path from which files are to be mounted at that specific mount path. 
+    You'll see a message like `Starting instance of <image-name> listening on localhost:<port>`. Then go to `localhost:<port>` in your browser to play with the custom image.
 
+### Manifest.json
 Below is an example of `manifest.json` file.                   
 ```json
 {
@@ -28,17 +50,11 @@ Below is an example of `manifest.json` file.
 * **name**: the image name
 * **version**: optional, the image tag
 * **httpPort**: the exposed port of the container
-* **mounts**: optonal, bind mount list of volumes to the container
+* **mounts**: optonal, mount list of volumes to the container. Files mounted at these mount paths persist across lab sessions in Coursera labs.
 * **environmentVars**: optional, list of environment variables of the container
 
-**Build run-lab image** and then you can start using `run-lab/run.sh` script to simulate 
-Coursera Labs build or run procedures.
-```
-docker build -t run-lab -f run-lab/Dockerfile .
-```
-
-**Example #1**: Build tensorflow-notebook image under build directory 
-`jupyter/tensorflow-notebook`. `Dockerfile` and `manifest.json` are required to start the build.
+### Examples
+**Example #1**: Build tensorflow-notebook image under build directory `jupyter/tensorflow-notebook`. `Dockerfile` and `manifest.json` are required to start the build.
 ```
 ./run-lab/run.sh build jupyter/tensorflow-notebook
 ```
@@ -50,7 +66,3 @@ docker build -t run-lab -f run-lab/Dockerfile .
 ```
 ./run-lab/run.sh run jupyter/tensorflow-notebook
 ```
-If you see `Tell me which volumes to mount for the following container volumes`, enter the 
-volumes to be mounted. You'll see `Starting instance of coursera/tensorflow-notebook listening on
- localhost:14941`. Then go to `localhost:14941` in your browser to play with the tensorflow 
- notebook.
