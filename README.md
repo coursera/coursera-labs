@@ -21,6 +21,8 @@
     ```
     ./run-lab/run.sh build <path to image folder> --add-submit-button
     ```
+    You can find the generated `Dockerfile` with the commands to add submit button under `<path to image folder>/generated` folder.
+    
     Build image of application other than jupyter notebook
     ```
     ./run-lab/run.sh build <path to image folder>

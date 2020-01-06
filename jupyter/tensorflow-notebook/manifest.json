@@ -1,5 +1,5 @@
 {
-  "name": "coursera/tensorflow-notebook",
+  "name": "base/tensorflow-notebook-v1.0",
   "httpPort": 8888,
   "mounts": [
     {

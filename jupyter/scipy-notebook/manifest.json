@@ -1,5 +1,5 @@
 {
-  "name": "coursera/scipy-notebook",
+  "name": "base/scipy-notebook-v1.0",
   "httpPort": 8888,
   "mounts": [
     {

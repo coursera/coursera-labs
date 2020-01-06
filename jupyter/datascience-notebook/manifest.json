@@ -1,5 +1,5 @@
 {
-  "name": "coursera/datascience-notebook",
+  "name": "base/datascience-notebook-v1.0",
   "httpPort": 8888,
   "mounts": [
     {
