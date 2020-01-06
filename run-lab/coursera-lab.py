@@ -93,9 +93,9 @@ def build_image(build_dir, image_tag):
     command = [arg for arg_group in command_parts for arg in arg_group]
     subprocess.call(command)
 
-def copy_directory(src, dst):
+def copy_directory(src, dst, ignore=None):
     try:
-        shutil.copytree(src, dst)
+        shutil.copytree(src, dst, ignore=ignore, dirs_exist_ok=True)
     except OSError as exc:
         if exc.errno == errno.ENOTDIR:
             shutil.copy(src, dst)
@@ -113,15 +113,20 @@ def execute_build(build_dir, manifest, add_submit_button):
 
     image_tag = manifest.image_tag
     if add_submit_button:
-        # Copy files for adding submit button to share folder under build_dir
+
         share_build_dir = os.path.join(build_dir, 'share')
+        # Copy other files from build_dir to build_dir/share, excluding Dockerfile and manifest.json
+        copy_directory(build_dir, share_build_dir, ignore=shutil.ignore_patterns('*Dockerfile',
+                                                                                 '*manifest.json'))
+        # Copy files for adding submit button to share folder under build_dir
         copy_directory('share', share_build_dir)
 
         build_dir_dockerfile = os.path.join(build_dir, 'Dockerfile')
         tmp_share_build_dir_dockerfile = os.path.join(share_build_dir, 'tmp-Dockerfile')
         share_build_dir_dockerfile = os.path.join(share_build_dir, 'Dockerfile')
 
-        os.rename(share_build_dir_dockerfile, tmp_share_build_dir_dockerfile)
+        os.rename(src=share_build_dir_dockerfile, dst=tmp_share_build_dir_dockerfile)
+
         # Create a new Dockerfile with instructions from build_dir and build_dir/share Dockerfile
         with open(share_build_dir_dockerfile, "w") as wf:
             with open(build_dir_dockerfile, "r") as base_rf:
@@ -129,8 +134,14 @@ def execute_build(build_dir, manifest, add_submit_button):
             with open(tmp_share_build_dir_dockerfile, "r") as share_rf:
                 wf.write(share_rf.read())
 
+
         # Build an image in build_dir/share
         build_image(share_build_dir, image_tag)
+
+        generated_build_dir = os.path.join(build_dir, 'generated')
+        os.mkdir(generated_build_dir)
+        generated_dockerfile=os.path.join(generated_build_dir, 'Dockerfile')
+        shutil.copy2(src = share_build_dir_dockerfile, dst=generated_dockerfile)
 
         # Clean up tmp files in build_dir/share
         shutil.rmtree(share_build_dir)
