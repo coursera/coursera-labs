@@ -11,18 +11,19 @@ import errno
 
 '''
 Docker client wrapper for Coursera Labs. This script simulates
-Coursera build and run procedures configured by the manifest.json file.
+Coursera Labs docker build and run procedures configured by the manifest.json file.
 
 Examples:
 
 # Build an image:
 coursera-lab build [build path]
 
+# Build a Jupyter notebook image with submit button:
+coursera-lab build [build path] --add-submit-button
+
 # Run an instance of your built image:
 coursera-lab run [build path]
 
-# Build an Jupyter notebook image with submit button:
-coursera-lab build [build path] --add-submit-button
 '''
 
 LAB_DEFAULTS_FILE_PATH = os.path.expanduser('~/.coursera/lab_defaults.json')
