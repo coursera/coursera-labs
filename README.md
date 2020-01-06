@@ -11,10 +11,12 @@
     run-lab image is a dockerized version of `run-lab/coursera-lab.py` script. `run-lab/coursera-lab.py` script simulates Coursera Labs docker build and run procedures.
     
 3. **Create a folder with your custom image files and `manifest.json`**
+
     We strongly recommend to use our example images `jupyter/datascience-notebook`, `jupyter/scipy-notebook` or `jupyter/tensorflow-notebook` as a base of your image. 
     Coursera labs script uses `manifest.json` to read configurations specific to your image. Details about `manifest.json` can be found [here](#manifestjson)
     
 4. **Build and Test your custom image locally**
+
     Build jupyter notebook image
     ```
     ./run-lab/run.sh build <path to image folder> --add-submit-button
