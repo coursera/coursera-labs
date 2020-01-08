@@ -1,6 +1,6 @@
 ## Coursera Labs
 
-This repository provides resources for creating custom images on Coursera Labs. This resource may be particularly helpful for those looking to add small modifications to the existing default images on Coursera Labs, which are included in this repository.
+This repository provides resources for creating custom images on Coursera Labs. It includes files to build and run the (3) base images on Coursera Labs. This resource may be particularly helpful for those looking to add small modifications to the existing default images on Coursera Labs, which are included in this repository.
 
 ### Quick Start
 
@@ -20,7 +20,7 @@ This repository provides resources for creating custom images on Coursera Labs. 
 
     Additionally, Coursera Labs script uses `manifest.json` to read configurations specific to your image. Details about `manifest.json` can be found [here](#manifestjson).
 
-4. **Build and Test your custom image locally**
+4. **Build and test your image locally**
 
     Build jupyter notebook image
     ```
@@ -40,7 +40,7 @@ This repository provides resources for creating custom images on Coursera Labs. 
 
     You'll see a message that says `Starting instance of <image-name> listening on localhost:<port>`. Then go to `localhost:<port>` in your browser to play with the custom image.
 
-### Manifest.json
+### Image configurations using `manifest.json`
 
 Coursera Labs script uses `manifest.json` to read configurations specific to your image. Below is an example of `manifest.json` file.                   
 ```json
