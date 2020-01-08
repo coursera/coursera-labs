@@ -18,7 +18,7 @@ This repository provides resources for creating custom images on Coursera Labs. 
 
     We also *strongly* recommend using the provided images as the basis for your custom images.
 
-    Additionally, Coursera Labs script uses `manifest.json` to read configurations specific to your image. Details about `manifest.json` can be found [here](#manifestjson).
+    Additionally, Coursera Labs script uses `manifest.json` to read configurations specific to your image. Details about `manifest.json` can be found [here](#image-configurations-using-manifestjson).
 
 4. **Build and test your image locally**
 
