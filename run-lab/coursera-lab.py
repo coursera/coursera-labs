@@ -139,7 +139,8 @@ def execute_build(build_dir, manifest, add_submit_button):
         build_image(share_build_dir, image_tag)
 
         generated_build_dir = os.path.join(build_dir, 'generated')
-        os.mkdir(generated_build_dir)
+        if not os.path.exists(generated_build_dir):
+            os.mkdir(generated_build_dir)
         generated_dockerfile=os.path.join(generated_build_dir, 'Dockerfile')
         shutil.copy2(src = share_build_dir_dockerfile, dst=generated_dockerfile)
 
