@@ -20,25 +20,41 @@ This repository provides resources for creating custom images on Coursera Labs. 
 
     Additionally, Coursera Labs script uses `manifest.json` to read configurations specific to your image. Details about `manifest.json` can be found [here](#image-configurations-using-manifestjson).
 
-4. **Build and test your image locally**
+4. **Build your image locally**
 
-    Build jupyter notebook image
+    <b>Jupyter Notebook images</b>: Build Jupyter Notebook image by running the following command:
     ```
     ./run-lab/run.sh build <path to image folder> --add-submit-button
     ```
-    You can find the generated `Dockerfile` with the commands to add submit button under `<path to image folder>/generated` folder.
+    This will create a new folder called `/generated` under your `<path to image folder>`.
 
-    Build image of an application other than Jupyter Notebook
+    <b>Other web app images</b>: Build image of an application other than Jupyter Notebook by running the following command:
     ```
     ./run-lab/run.sh build <path to image folder>
     ```
-    Run an instance of the built custom image
+5. **Test your image locally**
+    Run an instance of the built custom image by running the following command:
     ```
-    ./run-lab/run.sh run <image name>
+    ./run-lab/run.sh run <path to image folder>
+    ```
+    For example, if you built the tensorflow-notebook image that we provided,
+    ```
+    ./run-lab/run.sh run jupyter/tensorflow-notebook
     ```
     If you see a message that asks: `Tell me which volumes to mount for the following container volumes`, enter the local machine path from which files are to be mounted at that specific mount path.
 
     You'll see a message that says `Starting instance of <image-name> listening on localhost:<port>`. Then go to `localhost:<port>` in your browser to play with the custom image.
+    
+6. **Upload your image to the platform**
+
+    The build step should have created a folder called `/generated` under your `<path to image folder>`. In this folder, there will be a `Dockerfile` with all the relevant commands to build the image on the platform.
+
+    If you do not need any folders or files outside of the `Dockerfile`, you can create a .zip of the `Dockerfile` and then upload it as a Custom Image to the Lab Manager using the "Upload Build Files" button.
+
+    If you do need any folders or files to successfully build the image, make sure to include these folders in the `.zip` file as well. Make sure the `Dockerfile` is located in the root directory.
+    
+    You do not need to add `manifest.json` to the `.zip` file to upload successfully to the platform, unless your `Dockerfile` explicitly uses this.
+
 
 ### Image configurations using `manifest.json`
 
