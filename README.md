@@ -42,6 +42,7 @@ This repository provides resources for creating custom images on Coursera Labs. 
     You'll see a message that says `Starting instance of <image-name> listening on localhost:<port>`. Then go to `localhost:<port>` in your browser to play with the custom image.
     
 6. **Upload your image to the platform**
+
     The build step should have created a folder called `/generated` under your `<path to image folder>`. In this folder, there will be a `Dockerfile` with all the relevant commands to build the image on the platform.
 
     If you do not need any folders or files outside of the `Dockerfile`, you can create a .zip of the `Dockerfile` and then upload it as a Custom Image to the Lab Manager using the "Upload Build Files" button.
