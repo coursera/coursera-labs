@@ -35,7 +35,11 @@ This repository provides resources for creating custom images on Coursera Labs. 
 5. **Test your image locally**
     Run an instance of the built custom image by running the following command:
     ```
-    ./run-lab/run.sh run <image name>
+    ./run-lab/run.sh run <path to image folder>
+    ```
+    For example, if you built the tensorflow-notebook image that we provided,
+    ```
+    ./run-lab/run.sh run jupyter/tensorflow-notebook
     ```
     If you see a message that asks: `Tell me which volumes to mount for the following container volumes`, enter the local machine path from which files are to be mounted at that specific mount path.
 
@@ -48,6 +52,8 @@ This repository provides resources for creating custom images on Coursera Labs. 
     If you do not need any folders or files outside of the `Dockerfile`, you can create a .zip of the `Dockerfile` and then upload it as a Custom Image to the Lab Manager using the "Upload Build Files" button.
 
     If you do need any folders or files to successfully build the image, make sure to include these folders in the `.zip` file as well. Make sure the `Dockerfile` is located in the root directory.
+    
+    You do not need to add `manifest.json` to the `.zip` file to upload successfully to the platform, unless your `Dockerfile` explicitly uses this.
 
 
 ### Image configurations using `manifest.json`
