@@ -1,6 +1,6 @@
 ## Coursera Labs
 
-This repository provides resources for creating custom images on Coursera Labs. It includes files to build and run the (3) base images on Coursera Labs. This resource may be particularly helpful for those looking to add small modifications to the existing default images on Coursera Labs, which are included in this repository.
+This repository provides resources for creating custom images on Coursera Labs. It includes files to build and run the (3) base images on Coursera Labs. This resource may be particularly helpful for those looking to add small modifications to the existing default images on Coursera Labs. You may also find it helpful to use these scripts to add a submit button for your own Jupyter Notebook images.
 
 ### Quick Start
 
@@ -51,7 +51,7 @@ This repository provides resources for creating custom images on Coursera Labs. 
 
     If you do not need any folders or files outside of the `Dockerfile`, you can create a .zip of the `Dockerfile` and then upload it as a Custom Image to the Lab Manager using the "Upload Build Files" button.
 
-    If you do need any folders or files to successfully build the image, make sure to include these folders in the `.zip` file as well. Make sure the `Dockerfile` is located in the root directory.
+    If you do need any folders or files to successfully build the image (e.g. `requirements.txt`), make sure to include these files in the `.zip` file such that the `Dockerfile` can reference it successfully during the build process. Make sure the `Dockerfile` is located in the root directory.
     
     You do not need to add `manifest.json` to the `.zip` file to upload successfully to the platform, unless your `Dockerfile` explicitly uses this.
 
