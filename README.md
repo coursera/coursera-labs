@@ -1,6 +1,10 @@
 ## Coursera Labs
 
-This repository provides resources for creating custom images on Coursera Labs. It includes files to build and run the (3) base images on Coursera Labs. This resource may be particularly helpful for those looking to add small modifications to the existing default images on Coursera Labs. You may also find it helpful to use these scripts to add a submit button for your own Jupyter Notebook images.
+This repository provides resources for creating custom images on Coursera Labs. It includes files to build and run images on Coursera Labs, including the source files to set up our (3) base images. 
+
+This resource may be particularly helpful for those looking to:
+1) add small modifications to the existing default images on Coursera Labs
+2) add a submit button or bypass the token authentication flow for your own Jupyter Notebook images
 
 ### Quick Start
 
@@ -22,7 +26,7 @@ This repository provides resources for creating custom images on Coursera Labs. 
 
 4. **Build your image locally**
 
-    <b>Jupyter Notebook images</b>: Build Jupyter Notebook image by running the following command:
+    <b>Jupyter Notebook images</b>: Build Jupyter Notebook image by running the following command. The `--add-submit-button` option also takes care of the token authentication flow, so you should use this option for all Jupyter Notebook images you plan on using on Coursera Labs.
     ```
     ./run-lab/run.sh build <path to image folder> --add-submit-button
     ```
