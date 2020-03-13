@@ -8,17 +8,23 @@ define(['require'], function(require) {
     var configured_schema_name = coursera_metadata.schema_name;
     var schema_names = coursera_metadata.schema_names;
     // TODO: consider using environment variable to get the assignment link
-    var submission_page_url = (course_slug == null) ? "https://www.coursera.org":
+    var submission_page_url = (course_slug == null) ? null :
       "https://www.coursera.org/learn/" + course_slug + "/programming/" + graded_item_id;
     var with_part_id = (part_id == null) ? '': '~' + part_id;
     var constructed_schema_name = course_slug + '~' + graded_item_id + with_part_id;
     var schema_name = (configured_schema_name == null) ? constructed_schema_name: configured_schema_name;
 
-
     require(['jquery', 'base/js/dialog'], function($, dialog) {
       var body = $('<div/>')
-        .append($('<span> Go to </span>'))
-        .append($('<a></a>')
+        .append($('<span> Go to </span>'));
+      if (submission_page_url) {
+        body.append($('<a></a>')
+          .text(submission_page_url)
+          .attr('href', submission_page_url));
+      } else {
+        body.append($('<span>the assignment page in your course</span>'));
+      }
+      body.append($('<a></a>')
           .text(submission_page_url)
           .attr('href', submission_page_url))
         .append($('<span> to see your submissions.</span>'))
