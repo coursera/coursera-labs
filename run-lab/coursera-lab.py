@@ -132,6 +132,7 @@ def execute_build(build_dir, manifest, add_submit_button):
             with open(build_dir_dockerfile, "r") as base_rf:
                 wf.write(base_rf.read())
             with open(tmp_share_build_dir_dockerfile, "r") as share_rf:
+                wf.write("\n")
                 wf.write(share_rf.read())
 
 
