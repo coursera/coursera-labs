@@ -1,5 +1,5 @@
 {
-  "name": "base/tensorflow-notebook-v1.0",
+  "name": "base/tensorflow-notebook-v2.0",
   "httpPort": 8888,
   "mounts": [
     {

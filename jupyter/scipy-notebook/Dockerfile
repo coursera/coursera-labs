@@ -1,4 +1,4 @@
-FROM jupyter/scipy-notebook:135a595d2a93
+FROM jupyter/scipy-notebook:3b1f4f5e6cc1
 
 RUN fix-permissions /home/jovyan/.jupyter
 

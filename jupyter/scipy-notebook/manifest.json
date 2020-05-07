@@ -1,5 +1,5 @@
 {
-  "name": "base/scipy-notebook-v1.0",
+  "name": "base/scipy-notebook-v2.0",
   "httpPort": 8888,
   "mounts": [
     {
