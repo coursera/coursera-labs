@@ -18,7 +18,7 @@ This resource may be particularly helpful for those looking to:
 
 3. **Create a folder with your custom image files and `manifest.json`**
 
-    The folders `jupyter/datascience-notebook`, `jupyter/scipy-notebook` and `jupyter/tensorflow-notebook` include the files that build our base images. Please feel free to use these folders to test out this build flow.
+    The folders `jupyter/datascience-notebook/v2`, `jupyter/scipy-notebook/v2` and `jupyter/tensorflow-notebook/v2` include the files that build our v2 base images. Please feel free to use these folders to test out this build flow.
 
     We also *strongly* recommend using the provided images as the basis for your custom images.
 
@@ -43,7 +43,7 @@ This resource may be particularly helpful for those looking to:
     ```
     For example, if you built the tensorflow-notebook image that we provided,
     ```
-    ./run-lab/run.sh run jupyter/tensorflow-notebook
+    ./run-lab/run.sh run jupyter/tensorflow-notebook/v2
     ```
     If you see a message that asks: `Tell me which volumes to mount for the following container volumes`, enter the local machine path from which files are to be mounted at that specific mount path.
 
@@ -88,15 +88,15 @@ Coursera Labs script uses `manifest.json` to read configurations specific to you
 * **environmentVars**: optional, list of environment variables of the container
 
 ### Examples
-**Example #1**: Build tensorflow-notebook image under build directory `jupyter/tensorflow-notebook`. `Dockerfile` and `manifest.json` are required to start the build.
+**Example #1**: Build tensorflow-notebook v2 image under build directory `jupyter/tensorflow-notebook/v2`. `Dockerfile` and `manifest.json` are required to start the build.
 ```
-./run-lab/run.sh build jupyter/tensorflow-notebook
+./run-lab/run.sh build jupyter/tensorflow-notebook/v2
 ```
 **Example #2**: Build tensorflow-notebook image with Coursera submit button.
 ```
-./run-lab/run.sh build jupyter/tensorflow-notebook --add-submit-button
+./run-lab/run.sh build jupyter/tensorflow-notebook/v2 --add-submit-button
 ```
 **Example #3**: Run an instance of the built tensorflow-notebook image.
 ```
-./run-lab/run.sh run jupyter/tensorflow-notebook
+./run-lab/run.sh run jupyter/tensorflow-notebook/v2
 ```
