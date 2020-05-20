@@ -7,8 +7,6 @@ c.NotebookApp.token = ''
 # Allow requests from the proxy
 c.NotebookApp.allow_origin = '*'
 
-c.NotebookApp.nbserver_extensions = {
-    'jupyter_localize_extension': True,
-}
+c.NotebookApp.nbserver_extensions = {}
 
 c.NotebookApp.trust_xheaders = True
