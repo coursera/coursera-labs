@@ -1,0 +1,28 @@
+{
+    "telemetry.enableCrashReporter": false,
+    "telemetry.enableTelemetry": false,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "editor.renderControlCharacters": true,
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true,
+        "**/.Trash*": true
+    },
+    "workbench.startupEditor": "none",
+    "workbench.colorTheme": "Default Dark+",
+    "update.enableWindowsBackgroundUpdates": false,
+    "update.mode": "none",
+    "extensions.autoUpdate": false,
+    "extensions.autoCheckUpdates": false,
+    "extensions.ignoreRecommendations": true,
+    "actionButtons": {
+        "reloadButton": null
+    },
+    "python.pythonPath": "/usr/bin/python3",
+    "rust-client.rustupPath": "/usr/bin/rustup",
+    "liveServer.settings.ChromeDebuggingAttachment": true,
+    "java.debug.settings.console": "internalConsole"
+}
