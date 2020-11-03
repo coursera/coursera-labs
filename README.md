@@ -1,6 +1,6 @@
 ## Coursera Labs
 
-This repository provides resources for creating custom images on Coursera Labs. It includes files to build and run images on Coursera Labs, including the source files to set up our (3) base images. 
+This repository provides resources for creating custom images on Coursera Labs. It includes files to build and run images on Coursera Labs, including the source files to set up our (5) base images. 
 
 This resource may be particularly helpful for those looking to:
 1) add small modifications to the existing default images on Coursera Labs
@@ -92,7 +92,7 @@ Coursera Labs script uses `manifest.json` to read configurations specific to you
 ```
 ./run-lab/run.sh build jupyter/tensorflow-notebook/v2
 ```
-**Example #2**: Build tensorflow-notebook image with Coursera submit button.
+**Example #2**: Build tensorflow-notebook image with Coursera submit button. **This only works with Jupyter Notebook images.**
 ```
 ./run-lab/run.sh build jupyter/tensorflow-notebook/v2 --add-submit-button
 ```
