@@ -1,5 +1,5 @@
 {
-  "name": "base/vscode",
+  "name": "base/vscode-v1.0",
   "httpPort": 8080,
   "mounts": [
     {

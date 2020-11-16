@@ -1,0 +1,9 @@
+{
+  "name": "base/rstudio-v1.0",
+  "httpPort": 8787,
+  "mounts": [
+    {
+      "path": "/home/rstudio"
+    }
+  ]
+}
