@@ -2,7 +2,7 @@ import json
 import re
 import requests
 
-COURSERA_SUBMISSION_URL = 'https://hub.coursera-apps.org/api/workspaceSubmissions.v1'
+COURSERA_SUBMISSION_URL = 'https://hub.labs.coursera.org/api/workspaceSubmissions.v1'
 BATCH_CREATE_ACTION = '?action=createBatch'
 
 def submit(submission_token, schema_names):
