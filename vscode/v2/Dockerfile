@@ -191,6 +191,9 @@ USER root
 # Add python scripts to add submit button
 COPY --chown=coder:coder coursera-submit-button/ /home/coder/.local/share/code-server/User/coursera/
 
+# Turns off the welcome page
+COPY --chown=coder:coder settings.json /home/coder/.local/share/code-server/User/
+
 # Makes terminal open bash by default
 COPY start.sh /usr/local/bin/
 COPY config.yaml /tmp/config/code-server/

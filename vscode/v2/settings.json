@@ -1,6 +1,7 @@
 {
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
+    "window.menuBarVisibility": "visible",
     "editor.formatOnPaste": true,
     "editor.formatOnType": true,
     "editor.renderControlCharacters": true,
