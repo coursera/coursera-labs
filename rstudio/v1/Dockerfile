@@ -16,5 +16,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y texlive-full
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
+RUN git config --global core.fileMode false
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/init"]
