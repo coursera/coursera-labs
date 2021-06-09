@@ -84,7 +84,7 @@ ENV LANG en_US.utf8
 ENV DISABLE_TELEMETRY true
 
 # actual install of code server
-ENV CODE_VERSION="3.8.0"
+ENV CODE_VERSION="3.8.1"
 RUN curl -fsSL https://code-server.dev/install.sh | bash /dev/stdin --version $CODE_VERSION
 
 # Set up User
@@ -207,6 +207,11 @@ USER coder
 
 # Setup User Workspace
 RUN mkdir -p /home/coder/project
+
+# Persist git configuration options
+RUN ln -s /home/coder/project/.dotfiles-coursera/.gitconfig /home/coder/.gitconfig
+RUN ln -s /home/coder/project/.dotfiles-coursera/.git-credentials /home/coder/.git-credentials
+
 WORKDIR /home/coder/project
 
 ENTRYPOINT ["dumb-init", "--"]
