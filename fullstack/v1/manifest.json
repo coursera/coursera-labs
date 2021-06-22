@@ -1,0 +1,12 @@
+{
+  "name": "fullstack-v1",
+  "httpPort": 8080,
+  "mounts": [
+    {
+      "path": "/home/coder/project"
+    },
+    {
+      "path": "/data/db"
+    }
+  ]
+}
