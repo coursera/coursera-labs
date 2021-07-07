@@ -48,6 +48,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install --no-install-recommends -y nodejs \
     && npm install -g typescript
+# Yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get update \
+    && apt-get install --no-install-recommends yarn
 
 # Golang SDK
 ENV GO_VERSION="1.12.4"
@@ -63,8 +68,9 @@ RUN apt-get remove scala-library scala -y \
     && dpkg -i scala-2.13.1.deb
 
 # SBT
-RUN echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list \
-    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 \
+RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list \
+    && echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list \
+    && curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add \
     && apt-get update \
     && apt-get install sbt --no-install-recommends -y
 
@@ -92,6 +98,11 @@ RUN groupadd -r coder \
     && useradd -m -r coder -g coder -s /bin/bash \
     && echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/nopasswd
 USER coder
+
+# Install conda
+RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
+    && bash ~/miniconda.sh -b -p /home/coder/miniconda
+ENV PATH "${PATH}:/home/coder/miniconda/bin"
 
 # Set up User Go Environment
 RUN mkdir /home/coder/go
