@@ -90,7 +90,7 @@ ENV LANG en_US.utf8
 ENV DISABLE_TELEMETRY true
 
 # actual install of code server
-ENV CODE_VERSION="3.8.0"
+ENV CODE_VERSION="3.10.2"
 RUN curl -fsSL https://code-server.dev/install.sh | bash /dev/stdin --version $CODE_VERSION
 
 # Set up User
@@ -136,8 +136,11 @@ RUN echo "export TERM=xterm" >> /home/coder/.bashrc
 COPY extensions/ /tmp/
 RUN mkdir -p $VSCODE_EXTENSIONS/ms-vscode.cpptools-1.0.1 \
   && bsdtar --strip-components=1 -xf /tmp/cpptools-linux-1.0.1.vsix -C $VSCODE_EXTENSIONS/ms-vscode.cpptools-1.0.1 extension
-RUN code-server --install-extension danielpinto8zz6.c-cpp-compile-run --extensions-dir=$VSCODE_EXTENSIONS
-RUN code-server --install-extension matepek.vscode-catch2-test-adapter --extensions-dir=$VSCODE_EXTENSIONS
+RUN code-server --install-extension danielpinto8zz6.c-cpp-compile-run --extensions-dir=$VSCODE_EXTENSIONS \
+    # Install 2.20.1 version of Test Explorer UI extension. Later versions do not work. 
+    # 2.20.1 version does not support testExplorer.useNativeTesting option
+    && code-server --install-extension hbenl.vscode-test-explorer@2.20.1 --extensions-dir=$VSCODE_EXTENSIONS \
+    && code-server --install-extension matepek.vscode-catch2-test-adapter --extensions-dir=$VSCODE_EXTENSIONS
 
 # Set up C# Extension (disabled since it's always trying to install packages)
 #RUN code-server --install-extension ms-dotnettools.csharp --extensions-dir=$VSCODE_EXTENSIONS
@@ -147,8 +150,6 @@ RUN cat /usr/bin/cargo/env >> /home/coder/.bash_aliases
 
 # Set up Code Runner
 RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$VSCODE_EXTENSIONS \
-    # Set up Test Runner
-    && code-server --install-extension hbenl.vscode-test-explorer --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Go Extension
     && code-server --install-extension golang.go --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Python Extension
