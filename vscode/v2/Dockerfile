@@ -90,7 +90,7 @@ ENV LANG en_US.utf8
 ENV DISABLE_TELEMETRY true
 
 # actual install of code server
-ENV CODE_VERSION="3.10.2"
+ENV CODE_VERSION="3.11.0"
 RUN curl -fsSL https://code-server.dev/install.sh | bash /dev/stdin --version $CODE_VERSION
 
 # Set up User

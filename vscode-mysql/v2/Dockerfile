@@ -91,7 +91,7 @@ ENV LANG en_US.utf8
 ENV DISABLE_TELEMETRY true
 
 # actual install of code server
-ENV CODE_VERSION="3.10.2"
+ENV CODE_VERSION="3.11.0"
 RUN curl -fsSL https://code-server.dev/install.sh | bash /dev/stdin --version $CODE_VERSION
 
 # Set up User
@@ -240,7 +240,7 @@ RUN set -ex; \
     apt-key list > /dev/null
 
 ENV MYSQL_MAJOR 8.0
-ENV MYSQL_VERSION 8.0.25-1debian10
+ENV MYSQL_VERSION 8.0.26-1debian10
 
 RUN echo "deb http://repo.mysql.com/apt/debian/ buster mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
 
@@ -274,12 +274,7 @@ RUN chmod 755 /usr/local/bin/start.sh /usr/local/bin/mysqlServer.sh \
 
 USER coder
 
-RUN code-server --install-extension mtxr.sqltools --extensions-dir=$VSCODE_EXTENSIONS
-
-# Mysql server driver isn't available in the repository
-COPY extensions/ /tmp/
-RUN mkdir -p $VSCODE_EXTENSIONS/sqltools-driver-mysql \
-  && bsdtar --strip-components=1 -xf /tmp/mtxr.sqltools-driver-mysql-0.2.0.vsix -C $VSCODE_EXTENSIONS/sqltools-driver-mysql extension
+RUN code-server --install-extension formulahendry.vscode-mysql --extensions-dir=$VSCODE_EXTENSIONS
 
 ENV MYSQL_ALLOW_EMPTY_PASSWORD 1
 
