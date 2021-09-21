@@ -218,6 +218,11 @@ USER coder
 
 # Setup User Workspace
 RUN mkdir -p /home/coder/project
+
+# Persist git configuration options
+RUN ln -s /home/coder/project/.dotfiles-coursera/.gitconfig /home/coder/.gitconfig
+RUN ln -s /home/coder/project/.dotfiles-coursera/.git-credentials /home/coder/.git-credentials
+
 WORKDIR /home/coder/project
 
 ############# End of the copy of VSCode base image
