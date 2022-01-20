@@ -13,6 +13,10 @@ COPY .jupyter/ /home/$NB_USER/.jupyter/
 RUN fix-permissions /home/$NB_USER/.jupyter
 ENV PYTHONWARNINGS ignore
 
+RUN ln -s /home/$NB_USER/work/.dotfiles-coursera/.gitconfig /home/$NB_USER/.gitconfig
+RUN ln -s /home/$NB_USER/work/.dotfiles-coursera/.git-credentials /home/$NB_USER/.git-credentials
+COPY gitconfig.sh /usr/local/bin/start-notebook.d/
+
 # Set entry point
 EXPOSE 8888
 WORKDIR /home/$NB_USER/work

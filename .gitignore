@@ -1,2 +1,4 @@
 generated/
 /.idea
+*.DS_Store
+*.zip
