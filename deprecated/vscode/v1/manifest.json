@@ -1,0 +1,9 @@
+{
+  "name": "base/vscode-v1.0",
+  "httpPort": 8080,
+  "mounts": [
+    {
+      "path": "/home/coder/project"
+    }
+  ]
+}
