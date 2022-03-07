@@ -1,0 +1,241 @@
+<script>
+  const SCORE_REGEX = /.*\(Score: (\d+\.\d+) \/ (\d+\.\d+)\)/gm;
+  const TITLE_REGEX = /^(.*)\s\(.*$/gm;
+  const NUMERATION_REGEX = /In&nbsp;\[[\S\s]*?(<div class="cell border-box-sizing code_cell rendered">|$)/gm;
+
+  // Generate a cell object
+  /**
+   * { title, href, type, earnedPoints?, maxPoints?, passed? }
+   */
+  function getGradedCell(el, numerationArray) {
+    let navObject = {
+      title: el.firstChild.innerText,
+      href: el.firstChild.getAttribute('href'),
+      type: 'COMMENT',
+    };
+
+    if (SCORE_REGEX.test(el.innerText)) {
+      SCORE_REGEX.lastIndex = 0;
+      const regexResults = SCORE_REGEX.exec(el.innerText);
+      navObject.earnedPoints = parseFloat(regexResults[1]);
+      navObject.maxPoints = parseFloat(regexResults[2]);
+      navObject.passed = navObject.maxPoints - navObject.earnedPoints <= 0.001;
+      navObject.type = 'GRADED';
+      navObject.number = getCellNumber(navObject.href, numerationArray);
+      SCORE_REGEX.lastIndex = 0;
+    }
+
+    return navObject;
+  }
+
+  // Helper function to get the correct cell number for the left panel
+  function getCellNumber(href, numerationArray) {
+    // Remove the preceding # to use href as a matching expression
+    href = href.replace('#', '')
+
+    // Search in the array for a match in cell href
+    for (let i = 0; i < numerationArray.length; i++) {
+      if (numerationArray[i].includes(href)) {
+        // Remove the prefix that is always present due to NUMERATION_REGEX
+        const match = numerationArray[i].replace("In&nbsp;[", "");
+        return parseInt(match);
+      }
+    }
+    return -1;
+  }
+
+  // Render the different cell types
+  function renderCell(cell) {
+    let itemEl = document.createElement('li');
+    itemEl.style.cssText = "margin-top:12px;margin-bottom:12px;";
+
+    // Add the title for the cell
+    let titleEl = document.createElement('h5');
+    titleEl.style.cssText = "font-size:16px;font-weight:600;";
+    titleEl.innerText = `Cell ${cell.number} (${cell.href.substr(1)})`;
+    itemEl.appendChild(titleEl);
+
+    // Add content based on the cell type
+    let contentEl = document.createElement('div');
+
+    // For graded cells show the earned points and whether they passed
+    if (cell.type === 'GRADED') {
+      let pointsEl = document.createElement('span');
+      pointsEl.innerText = cell.passed ? 'Passed | ' : 'Try again | ';
+      pointsEl.innerText += `${cell.earnedPoints} / ${cell.maxPoints} points`;
+      contentEl.appendChild(pointsEl);
+    }
+    // For comments show a basic message (cell.type = 'COMMENT')
+    else {
+      let commentEl = document.createElement('span');
+      commentEl.innerText = 'Your grader left a comment';
+      contentEl.appendChild(commentEl);
+    }
+
+    // Link to jump to the cell
+    let linkEl = document.createElement('a');
+    linkEl.setAttribute('href', cell.href);
+    linkEl.style.cssText = 'color:#0056D2;';
+    linkEl.innerText = 'View feedback';
+    contentEl.appendChild(document.createElement('br'));
+    contentEl.appendChild(linkEl);
+
+    // Handle higlight when clicking the link
+    let relevantCell = document.getElementsByName(cell.href.substr(1))[0].parentElement.parentElement.parentElement;
+    linkEl.onclick = function (e) {
+      relevantCell.classList.add('bg-warning');
+      relevantCell.focus();
+      setTimeout(function () {
+        relevantCell.classList.remove('bg-warning');
+      }, 3000);
+    };
+
+    itemEl.appendChild(contentEl);
+
+    return itemEl;
+  }
+
+  // Add elements for the navigation to the body
+  function renderNewNavigation(cells, mainContainer) {
+    // Create the primary container
+    const navContainerContainer = document.createElement('div');
+    navContainerContainer.className = 'col-sm-3';
+    navContainerContainer.style.cssText = 'overflow: auto;';
+    const navContainer = document.createElement('div');
+    navContainer.style.cssText = 'margin-left: 5%; overflow: auto;';
+
+    // Create the header
+    const assignmentTitle = TITLE_REGEX.exec(
+      document.querySelector('body > div.container-fluid > div > div.panel-heading > h4').innerText
+    )[1];
+    const headerA = document.createElement('h6');
+    headerA.innerText = 'Grader Output';
+    const headerB = document.createElement('h3');
+    headerB.innerText = assignmentTitle;
+    navContainer.appendChild(headerA);
+    navContainer.appendChild(headerB);
+
+    // Tally points and pass/fail counts
+    let totalCells = 0,
+      earnedPoints = 0,
+      maxPoints = 0,
+      passCount = 0;
+    for (let i = 0; i < cells.length; i++) {
+      let cell = cells[i];
+      if (cell.type === 'GRADED') {
+        totalCells++;
+        earnedPoints += parseFloat(cell.earnedPoints);
+        maxPoints += parseFloat(cell.maxPoints);
+        if (cell.passed) passCount++;
+      }
+    }
+
+    // Create point total el
+    const totalScore = document.createElement('p');
+    totalScore.innerText = `${earnedPoints.toFixed(2)} / ${maxPoints.toFixed(2)} points earned`;
+    navContainer.appendChild(totalScore);
+
+    // Create pass fail count els
+    const passEl = document.createElement('p');
+    passEl.innerText = `${passCount} / ${totalCells} autograded cell${totalCells === 1 ? '' : 's'} passed`;
+    navContainer.appendChild(passEl);
+
+    const gradedCellsTitleEl = document.createElement('h4');
+    gradedCellsTitleEl.style.cssText = 'font-size:20px;font-weight:600';
+    gradedCellsTitleEl.innerText = 'Graded Cells';
+    navContainer.appendChild(gradedCellsTitleEl);
+
+    // Create the actual clickable links
+    const nav = document.createElement('ul');
+    nav.style.cssText = "padding-left:0px;"
+    for (let i = 0; i < cells.length; i++) {
+      nav.appendChild(renderCell(cells[i]));
+    }
+    navContainer.appendChild(nav);
+
+    // Add the nav container to the main page
+    navContainerContainer.appendChild(navContainer);
+    mainContainer.prepend(navContainerContainer);
+  }
+
+  // Fix the scores for every cell to match the Coursera value
+  function fixCellScores(cells, totalCellPoints, courseraMaxScore) {
+    for (let i = 0; i < cells.length; i++) {
+      const currentCell = cells[i];
+      // Prevents NaN in the nbgrader feedback HTML
+      if (currentCell.maxPoints != 0) {
+        const pctEarned = currentCell.earnedPoints / currentCell.maxPoints;
+
+        // Figure out the weight of the current cell in comparison to all cells
+        const cellWeight = currentCell.maxPoints / totalCellPoints;
+      
+        // Update the cell's max points based on weight
+        currentCell.maxPoints = (courseraMaxScore * cellWeight).toFixed(2);
+        currentCell.earnedPoints = (currentCell.maxPoints * pctEarned).toFixed(2);
+      }
+    }
+  }
+
+  // Load the navigation bar
+  function loadNavigation() {
+    // Parse the part score from Coursera
+    let courseraMaxScore = parseInt(document.getElementById('maxscore-var').value);
+
+    // Load each of the links to cells
+    const navElements = document.querySelector('#toc > ol').children;
+    let gradedCells = [];
+
+    // Replace newlines so that NUMERATION_REGEX can match EOF with $
+    const docString = document.body.innerHTML.replace(/\r?\n|\r/gm, " ");
+
+    // Get array of cells with their corresponding cell number
+    // We need to do it this way because querySelector only allows for CSS selectors,
+    // which are not sufficient for what we want to do here.
+    const numerationArray = docString.match(NUMERATION_REGEX);
+
+    // Convert each element to a JSON object
+    let totalCellPoints = 0;
+    for (let i = 0; i < navElements.length; i++) {
+      let cell = getGradedCell(navElements[i], numerationArray);
+      if (cell.type !== 'COMMENT') {
+        totalCellPoints += cell.maxPoints;
+        gradedCells.push(cell);
+      } 
+    }
+
+    // Correct the scores for each cell
+    fixCellScores(gradedCells, totalCellPoints, courseraMaxScore);
+
+     // override previously existing padding
+    document.querySelector('div#notebook').setAttribute('style', 'padding-top: 0px;');
+    document.querySelector('body').setAttribute('style', 'padding-top: 0px;');
+
+    // add whitespace
+    document.querySelector('div#notebook-container').setAttribute('style', 'padding-right: 5%');
+
+    document.documentElement.setAttribute('lang', 'en');
+    const mainContainer = document.querySelector('body > div.container');
+    mainContainer.className = 'container-fluid';
+
+    // Center the feedback in the page but also keep padding for smaller viewports
+    mainContainer.setAttribute('style', 'height: 100vh; max-width: 100vw');
+    document.querySelector('body > div.container-fluid > div').className += ' col-sm-9';
+    renderNewNavigation(gradedCells, mainContainer);
+    document.querySelector('body > div.container-fluid > div > div.panel-heading').remove();
+  }
+
+  window.onload = loadNavigation;
+</script>
+<!-- Style to allow scrolling if viewport is large enough -->
+<style type="text/css">
+  @media (min-width: 768px) {
+    .col-sm-3 {
+        height: 100vh;
+    }
+
+    .col-sm-9 {
+        height: 100vh;
+        overflow: auto;
+    }
+  }
+</style>

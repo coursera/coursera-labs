@@ -1,0 +1,15 @@
+{
+  "name": "nbgrader",
+  "httpPort": 8888,
+  "mounts": [
+    {
+      "path": "/home/jovyan/work"
+    }
+  ],
+  "environmentVars": [
+    {
+      "name": "WORKSPACE_TYPE",
+      "value": "instructor"
+    }
+  ]
+}
