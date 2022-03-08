@@ -1,0 +1,29 @@
+{
+  "name": "nbgrader",
+  "httpPort": 8888,
+  "mounts": [
+    {
+      "path": "/shared/grader"
+    },
+    {
+      "path": "/shared/submission"
+    },
+    {
+      "path": "/shared"
+    }
+  ],
+  "environmentVars": [
+    {
+      "name": "assignmentName",
+      "value": "ps1"
+    },
+    {
+      "name": "filename",
+      "value": "Quiz02.ipynb"
+    },
+    {
+      "name": "notebookId",
+      "value": "Quiz02.ipynb"
+    }
+  ]
+}

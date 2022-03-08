@@ -1,0 +1,10 @@
+source
+submitted
+autograded
+feedback
+nbgrader_config.py
+release/gradebook.db
+release/nbgrader_config.py
+release/options.json
+.hidden
+.readonly

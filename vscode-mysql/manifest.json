@@ -1,0 +1,15 @@
+{
+  "name": "base/vscode-mysql-v2.1",
+  "httpPort": 7000,
+  "mounts": [
+    {
+      "path": "/home/coder/project"
+    },
+    {
+      "path": "/home/nginx"
+    },
+    {
+      "path": "/var/lib/mysql"
+    }
+  ]
+}

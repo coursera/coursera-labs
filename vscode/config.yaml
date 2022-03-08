@@ -1,0 +1,6 @@
+bind-addr: 0.0.0.0:8080
+auth: none
+cert: false
+extensions-dir: /home/coder/.local/share/code-server/extensions
+disable-update-check: true
+user-data-dir: /home/coder/.local/share/code-server
