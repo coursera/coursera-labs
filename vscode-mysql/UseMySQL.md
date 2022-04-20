@@ -2,21 +2,13 @@
 
 ## Using MySQL with vscode mysql extension
 ---
-- Connect to mysql server by clicking the database icon in the left menu bar.
-- Select `Add new connection`, then select `MySQL`.
-- Connect to mysql server with the following settings:
-``` 
-    Connection name: (Anything)
-    Connect Using: Server and Port
-    Server Address: localhost
-    Port: 3306
-    Database: (Your database name)
-    Username: root (or coder)
-    Use password: Use empty password
-```
-- Click Save Connection, then Connect Now, you will see a `.sql` file opened in the editor.
-- Write your SQL queries in this file, then click Run on active connection to run this query.
-- More details on the extension:  [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools)
+- The extension lives in the File Explorer Tab, in the MySQL section.
+- Click the '+' icon. 
+- When prompted for hostname and username, enter "localhost" and "root", respectively. Hit enter for everything else. You should see a new connection show up.
+- To write a query, right-click on the database you want to use and select "New Query", or create a `.sql` file and prepend "USE" to any queries you with to run.
+- To run the query, right-click the `.sql` file and select "Run MySQL Query".
+- Right-click on the connection and select refresh to see database updates reflected.
+- More details on the extension: [MySQL](https://marketplace.visualstudio.com/items?itemName=formulahendry.vscode-mysql)
 
 <br/>
 
