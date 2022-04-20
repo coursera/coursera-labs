@@ -137,7 +137,6 @@ RUN go get -u \
     golang.org/x/lint/golint \
     golang.org/x/tools/gopls
 
-
 # Set up environment variables required for Scala to work (without cosmetic errors)
 RUN echo 'export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")' >> /home/coder/.bashrc
 RUN echo "export TERM=xterm" >> /home/coder/.bashrc
@@ -147,6 +146,19 @@ COPY extensions/ /tmp/
 RUN curl -# -L -o /tmp/cpptools-linux.vsix "https://github.com/microsoft/vscode-cpptools/releases/download/1.5.1/cpptools-linux.vsix" \
     && code-server --install-extension /tmp/cpptools-linux.vsix
 
+# Set up Go Extension
+RUN curl -# -L -o /tmp/golang.go.vsix "https://open-vsx.org/api/golang/Go/0.31.1/file/golang.Go-0.31.1.vsix" \
+    && code-server --install-extension /tmp/golang.go.vsix \
+# Set up JS prettier extension 
+    && curl -# -L -o /tmp/esbenp.prettier-vscode.vsix "https://open-vsx.org/api/esbenp/prettier-vscode/9.3.0/file/esbenp.prettier-vscode-9.3.0.vsix" \
+    && code-server --install-extension /tmp/esbenp.prettier-vscode.vsix \
+# Set up Python extension, fixed to older version due to VSCode version compatibility issues
+    && curl -# -L -o /tmp/ms-python.python.vsix "https://open-vsx.org/api/ms-python/python/2021.10.1317843341/file/ms-python.python-2021.10.1317843341.vsix" \
+    && code-server --install-extension /tmp/ms-python.python.vsix \
+# Metals downloads without prompting and doesn't work anyways, so it's commented out
+    && curl -# -L -o /tmp/scalameta.metals.vsix "https://open-vsx.org/api/scalameta/metals/1.13.0/file/scalameta.metals-1.13.0.vsix" \
+    && code-server --install-extension /tmp/scalameta.metals.vsix
+
 # Set up C# Extension (disabled since it's always trying to install packages)
 #RUN code-server --install-extension ms-dotnettools.csharp --extensions-dir=$VSCODE_EXTENSIONS
 
@@ -155,10 +167,6 @@ RUN cat /usr/bin/cargo/env >> /home/coder/.bash_aliases
 
 # Set up Code Runner
 RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$VSCODE_EXTENSIONS \
-    # Set up Go Extension
-    && code-server --install-extension golang.go --extensions-dir=$VSCODE_EXTENSIONS \
-    # Set up Python Extension
-    && code-server --install-extension ms-python.python --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Java Extension
     && code-server --install-extension redhat.java --extensions-dir=$VSCODE_EXTENSIONS \ 
     && code-server --install-extension vscjava.vscode-java-debug --extensions-dir=$VSCODE_EXTENSIONS \
@@ -167,8 +175,6 @@ RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$
     && code-server --install-extension vscjava.vscode-maven --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Scala Extension
     && code-server --install-extension scala-lang.scala --extensions-dir=$VSCODE_EXTENSIONS \
-    # Metals downloads without prompting and doesn't work anyways, so it's commented out
-    # && code-server --install-extension scalameta.metals --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Groovy Extension
     && code-server --install-extension marlon407.code-groovy --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up HTML/CSS Extension
@@ -178,7 +184,6 @@ RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$
     # Set up Rust Extension
     && code-server --install-extension rust-lang.rust --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up JavaScript/Node Extensions
-    && code-server --install-extension waderyan.nodejs-extension-pack --extensions-dir=$VSCODE_EXTENSIONS \
     && code-server --install-extension xabikos.JavaScriptSnippets --extensions-dir=$VSCODE_EXTENSIONS \
     && code-server --install-extension ms-vscode.node-debug2 --extensions-dir=$VSCODE_EXTENSIONS \
     && code-server --install-extension octref.vetur --extensions-dir=$VSCODE_EXTENSIONS \
@@ -187,32 +192,37 @@ RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$
     # Set up Chrome Extension
     && code-server --install-extension msjsdiag.debugger-for-chrome --extensions-dir=$VSCODE_EXTENSIONS \
     && code-server --install-extension ritwickdey.LiveServer --extensions-dir=$VSCODE_EXTENSIONS \
-    && code-server --install-extension seunlanlege.action-buttons --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up React Extensions
     && code-server --install-extension dsznajder.es7-react-js-snippets --extensions-dir=$VSCODE_EXTENSIONS \
-    && code-server --install-extension esbenp.prettier-vscode --extensions-dir=$VSCODE_EXTENSIONS \
     && code-server --install-extension dbaeumer.vscode-eslint --extensions-dir=$VSCODE_EXTENSIONS
 
 # Set up Chrome Viewer (can't be found on the code-server marketplace currently as of 07/20/2020)
 # We don't want to download the vsix file here because it fails too often.
 RUN mkdir -p $VSCODE_EXTENSIONS/vscode-browser-preview \
-  && bsdtar --strip-components=1 -xf /tmp/auchenberg.vscode-browser-preview-0.6.7.vsix -C $VSCODE_EXTENSIONS/vscode-browser-preview extension
+    && bsdtar --strip-components=1 -xf /tmp/auchenberg.vscode-browser-preview-0.6.7.vsix -C $VSCODE_EXTENSIONS/vscode-browser-preview extension
+
+# Set up coursera launch button extension
+RUN mkdir -p $VSCODE_EXTENSIONS/coursera-launch-button \
+    && bsdtar --strip-components=1 -xf /tmp/coursera-launch-button-0.0.1.vsix -C $VSCODE_EXTENSIONS/coursera-launch-button extension
 
 # This fixes the health check bug
 COPY index.html /home/travis/build/codercom/code-server/packages/server/build/web/
 
 # Remove extra notifications
-RUN find /home/coder/.local/share/code-server/extensions -wholename "*action-buttons*/out/src/init.js" \
-    | xargs sed -i --expression='/showInformationMessage/d'
-RUN find /home/coder/.local/share/code-server/extensions -wholename "*ritwickdey.liveserver*/out/src/announcement/index.js" \
+RUN find $VSCODE_EXTENSIONS -wholename "*ritwickdey.liveserver*/out/src/announcement/index.js" \
     | xargs sed -i --expression='/showInformationMessage/d'
 
 ENV SHELL /bin/bash
 
 USER root
 
+# Launch button
+COPY --chown=coder:coder coursera-launch-button/ $VSCODE_USER/coursera/
+COPY --chown=coder:coder launchButtonSettings.json /tmp/launchButtonSettings.json
+RUN mkdir -p /home/coder/coursera
+
 # Turns off the welcome page
-COPY --chown=coder:coder settings.json /home/coder/.local/share/code-server/User/
+COPY --chown=coder:coder settings.json $VSCODE_USER
 
 # Makes terminal open bash by default
 COPY start.sh /usr/local/bin/
@@ -229,7 +239,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Create directory for nginx-related files
 RUN mkdir -p $NGINX_FILES_PATH
-COPY nginx-files/.* /tmp/nginx-files/
+COPY nginx-files/ /tmp/nginx-files/
 
 USER coder
 
@@ -267,5 +277,7 @@ ENTRYPOINT ["dumb-init", "--"]
 USER root
 CMD ["start.sh"]
 
-# This will generally always be needed for React apps.
-RUN npm install react-scripts --global
+# This will generally always be needed for React apps
+RUN npm install react-scripts --global \
+    # Needed for reverse-proxy easy config
+    && npm install nginx-conf --global 

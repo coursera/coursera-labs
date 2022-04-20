@@ -1,0 +1,15 @@
+{
+  "name": "nginx-files",
+  "version": "1.0.0",
+  "description": "",
+  "main": "refreshProxyConfig.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nginx-conf": "^2.0.0"
+  }
+}
