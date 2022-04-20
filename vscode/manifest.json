@@ -1,9 +1,12 @@
 {
   "name": "base/vscode-v2.0",
-  "httpPort": 7000,
+  "httpPort": 8080,
   "mounts": [
     {
       "path": "/home/coder/project"
+    },
+    {
+      "path": "/home/coder/coursera"
     },
     {
       "path": "/home/nginx"

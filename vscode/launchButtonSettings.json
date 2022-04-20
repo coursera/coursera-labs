@@ -1,0 +1,14 @@
+{
+  "launchButtons": {
+    "defaultColor": "white",
+    "paths": [
+      {
+        "name": "Open Development Server",
+        "color": "white",
+        "entrypoint": "/serve/",
+        "tooltip": "Open /serve/"
+      }
+    ]
+  }
+}
+  

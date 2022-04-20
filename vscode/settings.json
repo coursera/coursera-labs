@@ -19,7 +19,7 @@
     "extensions.autoUpdate": false,
     "extensions.autoCheckUpdates": false,
     "extensions.ignoreRecommendations": true,
-    "actionButtons": {
+    "launchButtons": {
         "reloadButton": null
     },
     "python.pythonPath": "/usr/bin/python3",
