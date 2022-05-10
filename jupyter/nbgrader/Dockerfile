@@ -11,10 +11,12 @@ FROM ${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG}
 
 ENV NBGRADER_FILES_PATH=/coursera/nbgrader-files
 ENV GRADER_FILES_PATH=/coursera/grader
+ENV UNIT_TEST_FILES_PATH=/coursera/unit-tests
 ENV JN_WORK_DIR=/home/$NB_USER/work
 
 # Install nbgrader
-RUN pip install nbgrader==0.6.1
+RUN pip install nbgrader==0.6.1 \
+	&& pip install lxml
 
 USER root
 RUN mkdir -p $GRADER_FILES_PATH
@@ -26,6 +28,14 @@ COPY nbgrader-files/ $NBGRADER_FILES_PATH
 RUN chmod 777 -R $NBGRADER_FILES_PATH/
 # Add grid files
 COPY grader/ $GRADER_FILES_PATH
+
+# Add unit testing files
+# RUN cp -r unit-tests/ $UNIT_TEST_FILES_PATH
+COPY unit-tests/ $UNIT_TEST_FILES_PATH
+COPY unit-tests/grader $UNIT_TEST_FILES_PATH/grader
+COPY unit-tests/grader/unit-tests $UNIT_TEST_FILES_PATH/grader/unit-tests
+COPY unit-tests/submission/ $UNIT_TEST_FILES_PATH/submission
+RUN chmod 755 $UNIT_TEST_FILES_PATH
 
 COPY setup.sh /coursera/setup.sh
 RUN chmod 777 -R /coursera
