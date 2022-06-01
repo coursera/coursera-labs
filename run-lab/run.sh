@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Invoke docker container to run `coursera-lab.py` script
-if [ "$1" = "build" ] || [ "$1" = "run" ]; then
+if [ "$1" = "build" ] || [ "$1" = "run" ] || [ "$1" = "test" ]; then
 ACTION=$1
 BUILD_DIR="$(cd "$(dirname "$2")"; pwd)"
 BUILD_PATH="$BUILD_DIR/$(basename "$2")"

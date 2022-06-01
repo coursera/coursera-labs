@@ -34,7 +34,7 @@ mkdir -p "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME"
 cp "/shared/submission/$DECODED_SUBMISSION" "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$NOTEBOOK_FILENAME"
 
 # Get kernel language from the submitted assignment's metadata
-kernel_language="$(sed -n 's/"language": //p' "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$NOTEBOOK_FILENAME")"
+kernel_language="$(jq '.metadata.kernelspec.language' "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$NOTEBOOK_FILENAME")"
 
 # Allow authors to add custom nbgrader config by adding nbgrader_config.py under /release
 if [ -e "/shared/grader/nbgrader_config.py" ]; then

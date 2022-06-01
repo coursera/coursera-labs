@@ -87,6 +87,15 @@ Coursera Labs script uses `manifest.json` to read configurations specific to you
 * **mounts**: mount list of volumes to the container. Files mounted at these mount paths persist across lab sessions in Coursera Labs. In other words, you need at least one mount path to persist files across lab sessions.
 * **environmentVars**: optional, list of environment variables of the container
 
+### Unit Tests
+We're adding in unit testing frameworks to give us more confidence that our images do what we want them to do. For now, we only have unit tests in place for our nbgrader images, to verify that traceback redaction is working as expected. You can take advantage of these unit-tests with the command
+
+```
+./run-lab/run.sh test jupyter/nbgrader
+```
+
+You will be prompted to enter a filepath to which the rich feedback file will generated.
+
 ### Examples
 **Example #1**: Build tensorflow-notebook v2 image under build directory `jupyter/tensorflow-notebook/v2`. `Dockerfile` and `manifest.json` are required to start the build.
 ```

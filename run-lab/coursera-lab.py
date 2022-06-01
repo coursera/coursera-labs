@@ -255,11 +255,37 @@ def save_lab_defaults(name, value):
     with open(LAB_DEFAULTS_FILE_PATH, 'w') as file:
         json.dump(all_lab_defaults, file)
 
+def run_test(manifest):
+    image = manifest.image_tag
+
+    # Rewrite the manifest for unit testing
+    unit_test_manifest = manifest
+
+    # Set WORKSPACE_TYPE environment variable to "test"
+    workspace_type_set = False
+    for e in unit_test_manifest.environment_vars:
+        if e.name == 'WORKSPACE_TYPE':
+            e.value = 'test'
+            workspace_type_set = True
+    
+    if not workspace_type_set:
+        unit_test_manifest.environment_vars.append(ManifestEnvVariable({'name': 'WORKSPACE_TYPE', 'value': 'test'}))
+
+    # Set mount paths to grader and submission
+    unit_test_manifest.mounts = [
+        ManifestMount({'path': '/shared'})
+    ]
+
+    # Only unit tests for nbgrader at this moment
+    if image == 'nbgrader':
+        # lab handles the rest
+        run_lab(unit_test_manifest)
+        pass
 
 def main():
     parser = argparse.ArgumentParser(
         description='Docker client wrapper to simulate Coursera Labs build and run procedures.')
-    parser.add_argument('action', type=str, help='Either \'build\' or \'run\'')
+    parser.add_argument('action', type=str, help='Either \'build\', \'run\', or \'test\'')
     parser.add_argument('build_path', type=str, help='Path to docker build directory or manifest file')
     parser.add_argument("--add-submit-button", help="Add submit button to when building jupyter notebook image", action="store_true")
     
@@ -270,6 +296,8 @@ def main():
         execute_build(build_dir, manifest, args.add_submit_button)
     elif args.action == 'run':
         run_lab(manifest)
+    elif args.action == 'test':
+        run_test(manifest)
 
 if __name__ == '__main__':
     main()
