@@ -3,9 +3,6 @@
 NBGRADER_LEARNER="learner"
 ASSIGNMENT_NAME="unit-tests"
 GRADER_FILES="$UNIT_TEST_FILES_PATH/grader"
-SUBMISSION_FILES="$UNIT_TEST_FILES_PATH/submission"
-
-ASSIGNMENT_NAME="unit-tests"
 
 mkdir -p unit-test-env/submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME 
 cd unit-test-env
@@ -17,9 +14,6 @@ cp $GRADER_FILES_PATH/preamble.html preamble.html
 
 # Create submission folder for assignment
 mkdir -p "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME"
-
-# Copy student assignment from Coursera shared directory
-cp -r "$SUBMISSION_FILES/" "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/"
 
 # Allow authors to add custom nbgrader config by adding nbgrader_config.py under `/release`
 if [ -e "$UNIT_TEST_FILES_PATH/nbgrader_config.py" ]; then
