@@ -21,7 +21,7 @@ mkdir -p "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME"
 # Copy student assignment from Coursera shared directory
 cp -r "$SUBMISSION_FILES/" "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/"
 
-# Allow authors to add custom nbgrader config by adding nbgrader_config.py under /release
+# Allow authors to add custom nbgrader config by adding nbgrader_config.py under `/release`
 if [ -e "$UNIT_TEST_FILES_PATH/nbgrader_config.py" ]; then
     echo "Using instructor defined nbgrader_config"
     cp $UNIT_TEST_FILES_PATH/nbgrader_config.py nbgrader_config.py    
