@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NBGRADER_LEARNER="learner"
-ASSIGNMENT_NAME="unit-tests"
+ASSIGNMENT_NAME="test-files"
 
 if [[ "$#" -ne 1 ]]; then
     echo "Please enter exactly one argument"

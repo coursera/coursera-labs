@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NBGRADER_LEARNER="learner"
-ASSIGNMENT_NAME="unit-tests"
+ASSIGNMENT_NAME="test-files"
 GRADER_FILES="$UNIT_TEST_FILES_PATH/grader"
 
 mkdir -p unit-test-env/submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME 
