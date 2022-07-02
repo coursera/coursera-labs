@@ -8,16 +8,16 @@ from bs4 import BeautifulSoup
 # 2. Check that the number of tests hidden is correct
 # 3. For cells that feature hidden tests, check that traceback is redacted if present
 
-CELL_PASSED_MESSAGE = "<span class='ansi-green-intense-fg ansi-bold'>Congratulations! All test cases in this cell passed.</span>\n"
-CELL_FAILED_MESSAGE = "<span class='ansi-red-intense-fg ansi-bold'>One or more test cases in this cell did not pass.</span>\n"
-CELL_ERROR_MESSAGE = "<span class='ansi-black-fg ansi-bold'>Total possible points in this cell was 0. </span>\n"
+CELL_PASSED_MESSAGE = "Congratulations! All test cases in this cell passed."
+CELL_FAILED_MESSAGE = "One or more test cases in this cell did not pass."
+CELL_ERROR_MESSAGE = "Total possible points in this cell was 0."
 
 EXPECTED_RESULTS = r'# Hidden Tests: (True|False), Expected Number of Hints: (\d+), Expected Result: (\w+)'
 
 HINT_SECTION_REGEX = r'Instructor hints: \n([\w\W]*\n)'
 HINT_REGEX = r'\t.*\n'
 
-CELL_NUMBER_REGEX = r'<div class="prompt input_prompt">In&nbsp;(\d+):</div>'
+CELL_NUMBER_REGEX = r'<div class="prompt input_prompt">In\s+\[(\d+)\]:<\/div>'
 
 class Result:
     def __init__(self):
@@ -31,7 +31,7 @@ def get_feedback_text(file_path):
 
 # Search for HIDDEN TEST string that is part of hidden test pattern
 # Returns true if no hidden tests are expected or if none are found
-def check_for_hidden_tests(expected_hidden_tests, text, feedback):
+def check_for_hidden_tests(expected_hidden_tests, text, result):
     # If no hidden tests are expected, no further checks are needed
     if not expected_hidden_tests:
         return True
@@ -39,20 +39,20 @@ def check_for_hidden_tests(expected_hidden_tests, text, feedback):
     # If they are expected, make sure HIDDEN TEST delimiter does not show up
     hidden_test_delimiter_match = re.search('HIDDEN TESTS', text) 
     if hidden_test_delimiter_match is not None:
-        feedback += "Found hidden test delimiter.\n"
+        result.feedback += "Found hidden test delimiter.\n"
         return False
 
     # Lastly, check that we see "Hidden Tests Redacted" 
     test_redaction_str_match = re.search('Hidden Tests Redacted', text)
     if test_redaction_str_match is None:
-        feedback += 'Did not find the "Hidden Tests Redacted" string.\n'
+        result.feedback += 'Did not find the "Hidden Tests Redacted" string.\n'
         return False
     else:
         return True
 
 # Check that the cell has the correct number of hints
 # Currently, we do not check the contents of the hints themselves
-def check_for_hints(expected_num_hints, text, feedback):
+def check_for_hints(expected_num_hints, text, result):
     # Matches the whole section of hints
     hint_section = re.search(
         HINT_SECTION_REGEX,
@@ -72,12 +72,12 @@ def check_for_hints(expected_num_hints, text, feedback):
     if expected_num_hints == num_hints_found:
         return True
     else:
-        feedback += f'Found an unexpected number of comments. Expected {expected_num_hints}, found {num_hints_found}.\n'
+        result.feedback += f'Found an unexpected number of comments. Expected {expected_num_hints}, found {num_hints_found}.\n'
         return False
 
 # Check that the cell output contains the expected message
 # If no message is expected, make sure output is empty
-def check_cell_result(expected_cell_result, text, feedback):
+def check_cell_result(expected_cell_result, text, result):
     # Determine what output string we're searching for
     if expected_cell_result == 'pass': 
         cell_result_str = CELL_PASSED_MESSAGE
@@ -96,7 +96,7 @@ def check_cell_result(expected_cell_result, text, feedback):
         )
 
         if cell_result is None:
-            feedback += "Cell result output does not match what is expected.\n"
+            result.feedback += "Cell result output does not match what is expected.\n"
             return False
     else:
         # Search for the beginning of the output HTML
@@ -106,7 +106,7 @@ def check_cell_result(expected_cell_result, text, feedback):
         )
 
         if cell_result is not None:
-            feedback += "Cell output should have been empty but is not.\n"
+            result.feedback += "Cell output should have been empty but is not.\n"
             return False
 
     return True
@@ -128,7 +128,7 @@ def validate_cell(cell_text):
     )
 
     if expected_results is not None: 
-        expected_hidden_tests = bool(expected_results.group(1))
+        expected_hidden_tests = expected_results.group(1) == "True" 
         expected_num_hints = int(expected_results.group(2))
         expected_cell_result = expected_results.group(3)
     else:
@@ -137,13 +137,13 @@ def validate_cell(cell_text):
         expected_cell_result = "None"
 
     # Check conditions surrounding hidden tests
-    result.passed &= check_for_hidden_tests(expected_hidden_tests, cell_text, result.feedback)
+    result.passed &= check_for_hidden_tests(expected_hidden_tests, cell_text, result)
 
     # Check for the correct number of hints
-    result.passed &= check_for_hints(expected_num_hints, cell_text, result.feedback)
+    result.passed &= check_for_hints(expected_num_hints, cell_text, result)
 
     # Check the result of the cell
-    result.passed &= check_cell_result(expected_cell_result, cell_text, result.feedback)
+    result.passed &= check_cell_result(expected_cell_result, cell_text, result)
 
     if not result.passed:
         print(result.feedback)
@@ -162,7 +162,7 @@ def validate_feedback(file_path):
 
     # Go through cell by cell validating each one's contents
     for cell in cells:
-        passed_cells += validate_cell(cell.text)
+        passed_cells += validate_cell(str(cell))
 
     if passed_cells == len(cells):
         print("All cells passed validation!")
