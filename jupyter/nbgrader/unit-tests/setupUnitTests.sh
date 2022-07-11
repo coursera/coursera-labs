@@ -30,4 +30,4 @@ echo "Autograding assignments (this may take a few seconds)..."
 nbgrader autograde --assignment="$ASSIGNMENT_NAME" --create --force &> autograde.log
 
 # Generate the rich feedback for the assignment
-nbgrader generate_feedback "$ASSIGNMENT_NAME"
+nbgrader generate_feedback "$ASSIGNMENT_NAME" &> feedback.log
