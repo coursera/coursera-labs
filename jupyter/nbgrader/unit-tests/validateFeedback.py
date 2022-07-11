@@ -1,29 +1,34 @@
-from email import feedparser
 import sys, re
-from tkinter.tix import CELL
 from bs4 import BeautifulSoup
 
-# This works by checking the following:
-# 1. Make sure no HIDDEN TEST delimiters show up (confirm that tests are hidden in the cell bodies)
-# 2. Check that the number of tests hidden is correct
-# 3. For cells that feature hidden tests, check that traceback is redacted if present
+# This works by doing the following:
+# 1. Make sure no HIDDEN TEST delimiters show up (confirm that tests are hidden in the cell input)
+# 2. Check that the number hints displayed is correct
+# 3. Check that the overall cell result is correct (which message shows up in cell output)
 
+# Cell output messages based on overall cell result
 CELL_PASSED_MESSAGE = "Congratulations! All test cases in this cell passed."
 CELL_FAILED_MESSAGE = "One or more test cases in this cell did not pass."
 CELL_ERROR_MESSAGE = "Total possible points in this cell was 0."
 
+# Regex for the comment that determines the expected unit test behavior for each cell
 EXPECTED_RESULTS = r'# Hidden Tests: (True|False), Expected Number of Hints: (\d+), Expected Result: (\w+)'
 
-HINT_SECTION_REGEX = r'Instructor hints: \n([\w\W]*\n)'
+# Matches on the entire hint section
+HINT_SECTION_REGEX = r'Instructor hints: \n(\t.*\n)+'
+# Matches an individual hint
 HINT_REGEX = r'\t.*\n'
 
+# Matches the cell number
 CELL_NUMBER_REGEX = r'<div class="prompt input_prompt">In\s+\[(\d+)\]:<\/div>'
 
+# Result class to help store unit test results/feedback
 class Result:
     def __init__(self):
         self.feedback = ""
         self.passed = True
 
+# Read file into string
 def get_feedback_text(file_path):
     with open(file_path, "r") as feedback_file:
         feedback_text = feedback_file.read()
@@ -61,7 +66,7 @@ def check_for_hints(expected_num_hints, text, result):
 
     num_hints_found = 0
     if hint_section is not None:
-        # Get of the hints themselves.
+        # Get the hints themselves.
         hint_section = hint_section.group()
         hints = re.findall(
             HINT_REGEX,
@@ -111,9 +116,11 @@ def check_cell_result(expected_cell_result, text, result):
 
     return True
 
+# Test a specific cell
 def validate_cell(cell_text):
     result = Result()
 
+    # Get cell number for identification purposes
     cell_num = re.search(
         CELL_NUMBER_REGEX,
         cell_text
@@ -127,11 +134,13 @@ def validate_cell(cell_text):
         cell_text
     )
 
+    # Assign expected results
     if expected_results is not None: 
         expected_hidden_tests = expected_results.group(1) == "True" 
         expected_num_hints = int(expected_results.group(2))
         expected_cell_result = expected_results.group(3)
     else:
+        # Default expected results if the expected results comment is not there
         expected_hidden_tests = False
         expected_num_hints = 0
         expected_cell_result = "None"
@@ -151,6 +160,7 @@ def validate_cell(cell_text):
     else:
         return 1
 
+# Driver method that takes the file, parses it, and runs the cell-by-cell tests
 def validate_feedback(file_path):
     feedback_text = get_feedback_text(file_path)
     S = BeautifulSoup(feedback_text, 'lxml')
