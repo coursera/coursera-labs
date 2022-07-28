@@ -33,6 +33,9 @@ mkdir -p "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME"
 # Copy student assignment from Coursera shared directory
 cp "/shared/submission/$DECODED_SUBMISSION" "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$NOTEBOOK_FILENAME"
 
+# Get kernel language from the submitted assignment's metadata
+kernel_language="$(jq '.metadata.kernelspec.language' "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$NOTEBOOK_FILENAME")"
+
 # Allow authors to add custom nbgrader config by adding nbgrader_config.py under /release
 if [ -e "/shared/grader/nbgrader_config.py" ]; then
     echo "Using instructor defined nbgrader_config"
@@ -50,7 +53,7 @@ nbgrader generate_feedback "$ASSIGNMENT_NAME"
 
 # Scrub given feedback file to remove hidden tests and tracebacks
 # Checks options.json for toggling on/off hiding tests or tracebacks
-python scrub.py "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK" "$courseraPartMaxScore"
+python scrub.py "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK" "$courseraPartMaxScore" "$kernel_language"
 
 # Copy the cleaned feedback to the shared directory
 cp "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK.clean" /shared/htmlFeedback.html
