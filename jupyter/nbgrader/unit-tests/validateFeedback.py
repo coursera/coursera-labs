@@ -77,7 +77,7 @@ def check_for_hints(expected_num_hints, text, result):
     if expected_num_hints == num_hints_found:
         return True
     else:
-        result.feedback += f'Found an unexpected number of comments. Expected {expected_num_hints}, found {num_hints_found}.\n'
+        result.feedback += f'Found an unexpected number of hints. Expected {expected_num_hints}, found {num_hints_found}.\n'
         return False
 
 # Check that the cell output contains the expected message
