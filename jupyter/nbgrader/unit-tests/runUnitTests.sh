@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NBGRADER_LEARNER="learner"
-ASSIGNMENT_NAME="unit-tests"
+ASSIGNMENT_NAME="test-files"
 
 if [[ "$#" -ne 1 ]]; then
     echo "Please enter exactly one argument"
@@ -13,14 +13,12 @@ DECODED_FEEDBACK="$1_tests.html"
 
 cd unit-test-env
 
-# # Get kernel language from the submitted assignment's metadata
-kernel_language="$(sed -n 's/"language": //p' "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$NOTEBOOK_FILENAME")"
-
-echo "running tests for $1 kernel"
+# Get kernel language from the submitted assignment's metadata
+kernel_language="$(jq '.metadata.kernelspec.language' "submitted/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$NOTEBOOK_FILENAME")"
 
 # Scrub given feedback file to remove hidden tests and tracebacks
 # Checks options.json for toggling on/off hiding tests or tracebacks
-python scrub.py "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK" 100 "$kernel_language"
+python scrub.py "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK" 100 $kernel_language
 
 # Copy the cleaned feedback to the shared directory
 cp "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK.clean" ./"$1"_htmlFeedback.html

@@ -32,8 +32,7 @@ COPY grader/ $GRADER_FILES_PATH
 # Add unit testing files
 COPY unit-tests/ $UNIT_TEST_FILES_PATH
 COPY unit-tests/grader $UNIT_TEST_FILES_PATH/grader
-COPY unit-tests/grader/unit-tests $UNIT_TEST_FILES_PATH/grader/unit-tests
-COPY unit-tests/submission/ $UNIT_TEST_FILES_PATH/submission
+COPY unit-tests/grader/test-files $UNIT_TEST_FILES_PATH/grader/test-files
 RUN chmod 755 $UNIT_TEST_FILES_PATH
 
 COPY setup.sh /coursera/setup.sh
