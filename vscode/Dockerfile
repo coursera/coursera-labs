@@ -14,7 +14,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     dumb-init \
     git \
     sudo \
-    gdb \
     build-essential \
     ucommon-utils \
     zip \
@@ -60,7 +59,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
     && apt-get install --no-install-recommends yarn
 
 # Golang SDK
-ENV GO_VERSION="1.14.1"
+ENV GO_VERSION="1.17.13"
 RUN curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar -xz -C /usr/local
 
 # Make Python3 default
@@ -87,7 +86,7 @@ ENV RUSTUP_HOME "/bin/rustup"
 ENV CARGO_HOME "/bin/cargo"
 RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
 
-# Chromium SDK
+# Chromium SDK -- required for the old browser preview extension
 RUN curl -sLO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
 RUN rm google-chrome-stable_current_amd64.deb
@@ -123,19 +122,37 @@ ENV VSCODE_EXTENSIONS "/home/coder/.local/share/code-server/extensions"
 
 RUN mkdir -p ${VSCODE_USER}
 
-RUN go get -u \
-    github.com/mdempsky/gocode \
-    github.com/uudashr/gopkgs/cmd/gopkgs \
-    github.com/ramya-rao-a/go-outline \
+# Install golang github packages
+RUN go get \
+    # autocompletion daemon for golang
+    github.com/mdempsky/gocode \ 
+    # tool to get a list of available and importable Go packages
+    github.com/uudashr/gopkgs/cmd/gopkgs@v2.0 \ 
+    # a tool to extract JSON representation of declarations from Go source file
+    github.com/ramya-rao-a/go-outline \ 
+    # a tool to extract JSON representation of package symbols from Go source tree
     github.com/acroca/go-symbols \
-    golang.org/x/tools/cmd/guru \
-    golang.org/x/tools/cmd/gorename \
-    github.com/go-delve/delve/cmd/dlv \
-    github.com/stamblerre/gocode \
-    github.com/rogpeppe/godef \
-    github.com/sqs/goreturns \
-    golang.org/x/lint/golint \
-    golang.org/x/tools/gopls
+    # debugger for golang
+    github.com/go-delve/delve/cmd/dlv \ 
+    # autocompletion daemon for golang
+    github.com/stamblerre/gocode \ 
+    # tool to print location of the definition of a symbol
+    github.com/rogpeppe/godef \ 
+    # tool to add zero-value returns to incomplete Go return statements
+    github.com/sqs/goreturns
+
+# Install official golang tools
+RUN go install \
+    # a tool for answering questions about Go source code
+    golang.org/x/tools/cmd/guru@v0.1.12 \ 
+    # tool to perform precise type-safe renaming of identifiers
+    golang.org/x/tools/cmd/gorename@v0.1.12
+
+# Install golang language server separately due to package version differences
+RUN go install golang.org/x/tools/gopls@v0.9.1
+
+# Install golang linter separately due to package version differences
+RUN go install golang.org/x/lint/golint@v0.0.0-20210508222113-6edffad5e616
 
 # Set up environment variables required for Scala to work (without cosmetic errors)
 RUN echo 'export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")' >> /home/coder/.bashrc
@@ -146,24 +163,15 @@ COPY extensions/ /tmp/
 RUN curl -# -L -o /tmp/cpptools-linux.vsix "https://github.com/microsoft/vscode-cpptools/releases/download/1.5.1/cpptools-linux.vsix" \
     && code-server --install-extension /tmp/cpptools-linux.vsix
 
-# Set up Go Extension
-RUN curl -# -L -o /tmp/golang.go.vsix "https://open-vsx.org/api/golang/Go/0.31.1/file/golang.Go-0.31.1.vsix" \
-    && code-server --install-extension /tmp/golang.go.vsix \
-# Set up JS prettier extension 
-    && curl -# -L -o /tmp/esbenp.prettier-vscode.vsix "https://open-vsx.org/api/esbenp/prettier-vscode/9.3.0/file/esbenp.prettier-vscode-9.3.0.vsix" \
-    && code-server --install-extension /tmp/esbenp.prettier-vscode.vsix \
-# Set up Python extension, fixed to older version due to VSCode version compatibility issues
-    && curl -# -L -o /tmp/ms-python.python.vsix "https://open-vsx.org/api/ms-python/python/2021.10.1317843341/file/ms-python.python-2021.10.1317843341.vsix" \
-    && code-server --install-extension /tmp/ms-python.python.vsix \
-# Metals downloads without prompting and doesn't work anyways, so it's commented out
-    && curl -# -L -o /tmp/scalameta.metals.vsix "https://open-vsx.org/api/scalameta/metals/1.13.0/file/scalameta.metals-1.13.0.vsix" \
-    && code-server --install-extension /tmp/scalameta.metals.vsix
-
 # Set up C# Extension (disabled since it's always trying to install packages)
 #RUN code-server --install-extension ms-dotnettools.csharp --extensions-dir=$VSCODE_EXTENSIONS
 
 # Set up Rust alias
 RUN cat /usr/bin/cargo/env >> /home/coder/.bash_aliases
+
+# code-server v3.12.0 does not use the open VSX marketplace by default. This fixes that
+ENV SERVICE_URL=https://open-vsx.org/vscode/gallery 
+ENV ITEM_URL=https://open-vsx.org/vscode/item
 
 # Set up Code Runner
 RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$VSCODE_EXTENSIONS \
@@ -175,8 +183,11 @@ RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$
     && code-server --install-extension vscjava.vscode-maven --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Scala Extension
     && code-server --install-extension scala-lang.scala --extensions-dir=$VSCODE_EXTENSIONS \
-    # Set up Groovy Extension
-    && code-server --install-extension marlon407.code-groovy --extensions-dir=$VSCODE_EXTENSIONS \
+    && code-server --install-extension scalameta.metals --extensions-dir=$VSCODE_EXTENSIONS \
+    # Set up Go Extension
+    && code-server --install-extension golang.go --extensions-dir=$VSCODE_EXTENSIONS \
+    # Set up Python Extension
+    && code-server --install-extension ms-python.python@2021.10.1317843341 --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up HTML/CSS Extension
     && code-server --install-extension ecmel.vscode-html-css --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Ruby Extension
@@ -186,12 +197,14 @@ RUN code-server --install-extension formulahendry.code-runner --extensions-dir=$
     # Set up JavaScript/Node Extensions
     && code-server --install-extension xabikos.JavaScriptSnippets --extensions-dir=$VSCODE_EXTENSIONS \
     && code-server --install-extension ms-vscode.node-debug2 --extensions-dir=$VSCODE_EXTENSIONS \
+    && code-server --install-extension esbenp.prettier-vscode \
+    # Set up Vue.js Tooling
     && code-server --install-extension octref.vetur --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up PHP Extension
     && code-server --install-extension bmewburn.vscode-intelephense-client --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up Chrome Extension
     && code-server --install-extension msjsdiag.debugger-for-chrome --extensions-dir=$VSCODE_EXTENSIONS \
-    && code-server --install-extension ritwickdey.LiveServer --extensions-dir=$VSCODE_EXTENSIONS \
+    && code-server --install-extension ritwickdey.liveServer --extensions-dir=$VSCODE_EXTENSIONS \
     # Set up React Extensions
     && code-server --install-extension dsznajder.es7-react-js-snippets --extensions-dir=$VSCODE_EXTENSIONS \
     && code-server --install-extension dbaeumer.vscode-eslint --extensions-dir=$VSCODE_EXTENSIONS
@@ -253,9 +266,8 @@ RUN sudo chmod 766 /var/log/supervisor/*
 # Setup User Workspace
 RUN mkdir -p /home/coder/project
 
-# Persist git configuration options
-RUN ln -s /home/coder/project/.dotfiles-coursera/.gitconfig /home/coder/.gitconfig
-RUN ln -s /home/coder/project/.dotfiles-coursera/.git-credentials /home/coder/.git-credentials
+# Copy the default .hidden file
+COPY .hidden /tmp/.hidden
 
 # Create a template reverse-proxy for partners to modify if they wish
 COPY nginx-files/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf.template

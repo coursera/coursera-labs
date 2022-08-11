@@ -26,5 +26,6 @@
     "rust-client.rustupPath": "/usr/bin/rustup",
     "liveServer.settings.ChromeDebuggingAttachment": true,
     "java.debug.settings.console": "internalConsole",
-    "http.proxySupport": "off"
+    "http.proxySupport": "off",
+    "github.gitAuthentication": false
 }
