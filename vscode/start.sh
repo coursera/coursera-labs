@@ -2,9 +2,17 @@
 su -c "cp -n /tmp/launchButtonSettings.json /home/coder/coursera/" - coder
 python3 ${VSCODE_USER}/coursera/refreshButtonConfig.py
 
-# git in lab persistence + default options
-mkdir -p /home/coder/project/.dotfiles-coursera
-git config --global core.fileMode false
+# prevent the script from re-copying these files over in student lab
+if [ "${WORKSPACE_TYPE}" = "instructor" ]; then
+    # git in lab persistence + default options
+    mkdir -p -m777 /home/coder/project/.dotfiles-coursera
+    su -c "ln -s /home/coder/project/.dotfiles-coursera/.gitconfig /home/coder/.gitconfig" - coder
+    su -c "ln -s /home/coder/project/.dotfiles-coursera/.git-credentials /home/coder/.git-credentials" - coder
+    su -c "git config --global core.fileMode false" - coder
+
+    # Hide certain files in the /home/coder/project directory
+    su -c "cp -n /tmp/.hidden /home/coder/project/.hidden" - coder
+fi
 
 # initialize npm inside home directory
 cd /home/coder/
