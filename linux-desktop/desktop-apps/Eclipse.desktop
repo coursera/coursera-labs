@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=2022.12
+Type=Application
+Name=Eclipse
+Comment=Eclipse IDE
+Exec=/opt/eclipse/eclipse %u
+Icon=/opt/eclipse/icon.xpm
+Path=/home/coder
+Terminal=false
+StartupNotify=true
+
