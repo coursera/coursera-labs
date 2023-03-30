@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=2022.3.2
+Type=Application
+Name=IntelliJ
+Comment=IntelliJ IDE
+Exec=/opt/intelliJ/bin/idea.sh %u
+Icon=/opt/intelliJ/bin/idea.svg
+Path=/home/coder
+Terminal=false
+StartupNotify=true
