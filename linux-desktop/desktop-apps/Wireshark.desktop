@@ -1,10 +1,10 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Firefox Web Browser
-Comment=Web Browser
-Exec=firefox %u
-Icon=firefox
+Name=Wireshark
+Comment=Packet Analyzer
+Exec=wireshark %u
+Icon=org.wireshark.Wireshark
 Path=/home/coder
 Terminal=false
 StartupNotify=true

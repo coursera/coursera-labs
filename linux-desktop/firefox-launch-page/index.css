@@ -1,0 +1,14 @@
+html *{
+   color: #000 !important;
+   font-family: 'Source Sans Pro', sans-serif;
+}
+
+.title {
+    font-size: 3rem;
+    margin-left: 4vw;
+}
+
+.description {
+    font-size: 1rem;
+    margin-left: 4vw
+}
