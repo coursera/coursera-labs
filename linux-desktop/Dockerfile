@@ -3,7 +3,7 @@ FROM openkbs/jdk-mvn-py3-vnc
 # [Re]set env variables
 ENV USER=coder
 ENV HOME=/home/${USER}
-ENV ECLIPSE_WORKSPACE=${HOME}/eclipse-workspace
+ENV ECLIPSE_WORKSPACE=${HOME}/coursera/eclipse-workspace
 ENV NO_VNC_HOME=${HOME}/noVNC
 ENV INST_SCRIPTS=${HOME}/install
 ENV WORKSPACE=${HOME}/workspace
@@ -42,6 +42,11 @@ RUN sudo wget -cq ${ECLIPSE_DOWNLOAD_URL}/${ECLIPSE_TAR} && \
     sudo tar xf ${ECLIPSE_TAR} --no-same-owner && \
     sudo rm ${ECLIPSE_TAR}
 
+<<<<<<< HEAD
+COPY eclipse.ini /opt/eclipse/eclipse.ini
+
+=======
+>>>>>>> d3276c08afde4ab4289c8856a149ec5881cab159
 RUN mkdir -p ${HOME}/.eclipse ${ECLIPSE_WORKSPACE} && \
     sudo chown -R ${USER}:${USER} ${HOME} ${HOME}/.eclipse ${ECLIPSE_WORKSPACE}
 
@@ -59,6 +64,25 @@ RUN echo "wireshark-common wireshark-common/install-setuid boolean true" | sudo 
     && sudo add-apt-repository ppa:wireshark-dev/stable -y \
     && sudo apt update \
     && sudo apt install -y wireshark
+
+# Add coder to the group to be able to run wireshark
+RUN sudo usermod -a -G wireshark $USER \
+    && sudo setcap cap_net_admin,cap_net_raw=ep /usr/bin/dumpcap
+
+# Copy over resources for firefox launch page
+COPY firefox-launch-page/ /tmp/firefox-launch-page
+COPY syspref.js /etc/firefox/
+RUN sudo wget -O /tmp/Source_Sans_Pro.zip https://fonts.google.com/download?family=Source%20Sans%20Pro
+
+# Allow for easier customization of filesystem, especially under mount point
+COPY vnc_startup.sh /dockerstartup/vnc_startup.sh
+COPY coursera-start.sh /dockerstartup/coursera-start.sh
+
+# Run chmod separately from COPY because Coursera docker does not support it
+RUN sudo chmod 644 /tmp/firefox-launch-page/* \
+    && sudo chmod 644 /etc/firefox/syspref.js \
+    && sudo chmod 777 /dockerstartup/vnc_startup.sh \
+    && sudo chmod 777 /dockerstartup/coursera-start.sh
 
 #################################
 ### VNC ####
@@ -79,10 +103,7 @@ RUN ln -sf ${HOME}/noVNC/vnc_lite.html ${HOME}/noVNC/index.html
 COPY --chown=${USER}:${USER} desktop-apps/ ${HOME}/Desktop/
 
 RUN rm ${HOME}/Desktop/Google-Chrome.desktop \
-    && chmod 755 ${HOME}/Desktop/Eclipse.desktop \
-    && chmod 755 ${HOME}/Desktop/IntelliJ.desktop
+    && chmod 755 ${HOME}/Desktop/Eclipse.desktop ${HOME}/Desktop/IntelliJ.desktop ${HOME}/Desktop/Firefox.desktop ${HOME}/Desktop/Wireshark.desktop
 
 # Remove sudo access from coder
 RUN sudo gpasswd -d coder sudo
-
-WORKDIR ${ECLIPSE_WORKSPACE}
