@@ -42,8 +42,11 @@ RUN sudo wget -cq ${ECLIPSE_DOWNLOAD_URL}/${ECLIPSE_TAR} && \
     sudo tar xf ${ECLIPSE_TAR} --no-same-owner && \
     sudo rm ${ECLIPSE_TAR}
 
+<<<<<<< HEAD
 COPY eclipse.ini /opt/eclipse/eclipse.ini
 
+=======
+>>>>>>> d3276c08afde4ab4289c8856a149ec5881cab159
 RUN mkdir -p ${HOME}/.eclipse ${ECLIPSE_WORKSPACE} && \
     sudo chown -R ${USER}:${USER} ${HOME} ${HOME}/.eclipse ${ECLIPSE_WORKSPACE}
 
