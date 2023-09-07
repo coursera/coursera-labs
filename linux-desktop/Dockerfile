@@ -42,11 +42,8 @@ RUN sudo wget -cq ${ECLIPSE_DOWNLOAD_URL}/${ECLIPSE_TAR} && \
     sudo tar xf ${ECLIPSE_TAR} --no-same-owner && \
     sudo rm ${ECLIPSE_TAR}
 
-<<<<<<< HEAD
 COPY eclipse.ini /opt/eclipse/eclipse.ini
 
-=======
->>>>>>> d3276c08afde4ab4289c8856a149ec5881cab159
 RUN mkdir -p ${HOME}/.eclipse ${ECLIPSE_WORKSPACE} && \
     sudo chown -R ${USER}:${USER} ${HOME} ${HOME}/.eclipse ${ECLIPSE_WORKSPACE}
 
@@ -83,6 +80,12 @@ RUN sudo chmod 644 /tmp/firefox-launch-page/* \
     && sudo chmod 644 /etc/firefox/syspref.js \
     && sudo chmod 777 /dockerstartup/vnc_startup.sh \
     && sudo chmod 777 /dockerstartup/coursera-start.sh
+
+# Explicitly start window manager
+# xfce4-session initializes the entire linux desktop session, so we want to 
+# explicitly add in a call to start the window manager just before it to make
+# sure a window manager is running.
+RUN sudo sed -i 's/^\s*xfce4-session/    xfwm4\n    xfce4-session/g' /etc/xdg/xfce4/xinitrc
 
 #################################
 ### VNC ####

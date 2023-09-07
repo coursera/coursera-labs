@@ -53,10 +53,7 @@ nbgrader generate_feedback "$ASSIGNMENT_NAME"
 
 # Scrub given feedback file to remove hidden tests and tracebacks
 # Checks options.json for toggling on/off hiding tests or tracebacks
-python scrub.py "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK" "$courseraPartMaxScore" "$kernel_language"
+python scrub.py "$NBGRADER_LEARNER" "$ASSIGNMENT_NAME" "$DECODED_FEEDBACK" "$courseraPartMaxScore" "$kernel_language" "$NOTEBOOK_FILENAME"
 
 # Copy the cleaned feedback to the shared directory
 cp "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK.clean" /shared/htmlFeedback.html
-
-# Calculate score and generate Coursera JSON
-python scoreCalculator.py "$ASSIGNMENT_NAME" "$NOTEBOOK_FILENAME" "$NBGRADER_LEARNER"

@@ -230,7 +230,7 @@
                             credentials: { password: password } });
             rfb.viewOnly = WebUtil.getConfigVar('view_only', false);
             rfb.addEventListener("connect",  connected);
-            rfb.addEventListener("disconnect", disconnected);
+            // rfb.addEventListener("disconnect", disconnected);
             rfb.addEventListener("capabilities", function () { updatePowerButtons(); });
             rfb.addEventListener("credentialsrequired", credentials);
             rfb.addEventListener("desktopname", updateDesktopName);
