@@ -1,4 +1,4 @@
-FROM python:3.8.1-slim
+FROM --platform=linux/amd64 python:3.8.1-slim
 
 RUN apt-get update 
 RUN apt-get install -y curl 

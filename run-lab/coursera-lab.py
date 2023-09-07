@@ -82,6 +82,7 @@ def read_manifest(path):
 def build_image(build_dir, image_tag):
     command_parts = [
         ['docker', 'build'],
+        ['--platform', 'linux/amd64'],
         ['-t', image_tag],
         [build_dir],
     ]
