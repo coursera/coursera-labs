@@ -32,7 +32,7 @@ This resource may be particularly helpful for those looking to:
     <b>Jupyter Notebook images</b>: Build Jupyter Notebook image by running the following command. The `--add-submit-button` option also takes care of the token authentication flow, so you should use this option for all Jupyter Notebook images you plan on using on Coursera Labs.
 
     ```
-    ./run-lab/run.sh build <path to image folder> --add-submit-button
+    ./run-lab/run.sh build <path to image folder>
     ```
 
     This will create a new folder called `/generated` under your `<path to image folder>`.
