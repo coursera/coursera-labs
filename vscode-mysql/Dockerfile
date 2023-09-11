@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean
 
 # Node SDK
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install --no-install-recommends -y nodejs \
     && npm install -g typescript
 

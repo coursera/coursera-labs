@@ -3,27 +3,13 @@
   "httpPort": 8888,
   "mounts": [
     {
-      "path": "/shared/grader"
-    },
-    {
-      "path": "/shared/submission"
-    },
-    {
-      "path": "/shared"
+      "path": "/home/jovyan/work"
     }
   ],
   "environmentVars": [
     {
-      "name": "assignmentName",
-      "value": "ps1"
-    },
-    {
-      "name": "filename",
-      "value": "Quiz02.ipynb"
-    },
-    {
-      "name": "notebookId",
-      "value": "Quiz02.ipynb"
+      "name": "WORKSPACE_TYPE",
+      "value": "instructor"
     }
   ]
 }

@@ -6,7 +6,7 @@
 #   Argument BASE_IMAGE_TAG may select a version other than latest
 
 ARG BASE_IMAGE_NAME=jupyter/datascience-notebook
-ARG BASE_IMAGE_TAG=3b1f4f5e6cc1
+ARG BASE_IMAGE_TAG=latest
 FROM ${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG}
 
 ENV NBGRADER_FILES_PATH=/coursera/nbgrader-files
@@ -15,8 +15,8 @@ ENV UNIT_TEST_FILES_PATH=/coursera/unit-tests
 ENV JN_WORK_DIR=/home/$NB_USER/work
 
 # Install nbgrader
-RUN pip install nbgrader==0.6.1 \
-	&& pip install lxml
+RUN pip install -U jupyterlab nbgrader lxml
+
 
 USER root
 RUN mkdir -p $GRADER_FILES_PATH
@@ -53,10 +53,14 @@ ENV PYTHONWARNINGS ignore
 # Install jq
 ENV JQ_VERSION='1.5'
 
+ENV JQ_VERSION='1.5'
+
+
 RUN apt-get update && sudo apt-get install -y gnupg && \
-    wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \ 
-    chmod +x ./jq && \
-    cp jq /usr/bin
+wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \
+chmod +x ./jq && \
+cp jq /usr/bin
+
 
 # Need to run as root for grader to write into /shared/feedback.json
 # we have user namespaces enabled
@@ -65,14 +69,15 @@ RUN apt-get update && sudo apt-get install -y gnupg && \
 # Enable all nbgrader extensions
 RUN jupyter nbextension install --sys-prefix --py nbgrader --overwrite && \
     jupyter nbextension enable --sys-prefix --py nbgrader && \
+    jupyter labextension enable --level=sys_prefix nbgrader && \
     jupyter serverextension enable --sys-prefix --py nbgrader
-# Disable Assignment List and Course List extensions for everyone
-RUN jupyter nbextension disable --sys-prefix assignment_list/main --section=tree && \
- 	jupyter serverextension disable --sys-prefix nbgrader.server_extensions.assignment_list && \
- 	jupyter nbextension disable --sys-prefix course_list/main --section=tree && \
- 	jupyter serverextension disable --sys-prefix nbgrader.server_extensions.course_list && \
- 	# Disable official formgrader server extension
- 	jupyter serverextension disable --sys-prefix nbgrader.server_extensions.formgrader
+# # Disable Assignment List and Course List extensions for everyone
+# RUN jupyter nbextension disable --sys-prefix assignment_list/main --section=tree && \
+#  	jupyter serverextension disable --sys-prefix nbgrader.server_extensions.assignment_list && \
+#  	jupyter nbextension disable --sys-prefix course_list/main --section=tree && \
+#  	jupyter serverextension disable --sys-prefix nbgrader.server_extensions.course_list && \
+#  	# Disable official formgrader server extension
+#  	jupyter serverextension disable --sys-prefix nbgrader.server_extensions.formgrader
 
 # Persist git configuration options
 RUN ln -s /home/$NB_USER/work/.dotfiles-coursera/.gitconfig /home/$NB_USER/.gitconfig
@@ -82,4 +87,18 @@ VOLUME /shared
 
 RUN fix-permissions /home/jovyan/.jupyter
 
+ENV DOCKER_STACKS_JUPYTER_CMD=lab
+
+EXPOSE 8888
+
+USER root
+
+RUN fix-permissions /home/jovyan/.jupyter
+
+EXPOSE 8888
+WORKDIR /home/$NB_USER/work
+COPY nbgrader-files/release/nbgrader_config.py ./nbgrader_config.py
+
 ENTRYPOINT ["/coursera/setup.sh"]
+
+USER $NB_USER

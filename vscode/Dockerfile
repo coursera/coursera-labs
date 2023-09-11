@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     valgrind \
     gdb \
     # C# SDK
-    mono-complete \
+    # mono-complete \
     # Ruby SDK
     ruby-full \
     # PHP SDK
@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean
 
 # Node SDK
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install --no-install-recommends -y nodejs \
     && npm install -g typescript
 
