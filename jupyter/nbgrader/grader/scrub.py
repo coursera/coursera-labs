@@ -1,4 +1,3 @@
-# The default script for cleaning up Nbgrader feedback files
 # 07-12-2021: Blake Johnson
 # 09-28-2021: Joseph Li
 import os,re,json,sys
@@ -83,97 +82,115 @@ def stylize_output(message):
 		"""
 	return message
 
-# Method to handle all of the feedback processing
-def redact_feedback(match_obj, options, kernel_language, testCaseResults):
-	# print("Match: ", match_obj)
+def extract_cell_name(soup):
+	cell_name_element = soup.find('a')
+	if cell_name_element:
+		return cell_name_element['name']
+	else:
+		return None
+
+def extract_cell_number(soup):
+	input_prompt = soup.find("div", class_="prompt input_prompt")
+	matched_number = CELL_NUM_REGEX.search(input_prompt.string)
+
+	#Testing
+	if matched_number:
+		cell_number = int(matched_number.group(1))
+		return cell_number
+	else: 
+		return None
+
+def extract_score(cell_html):
+	cell_score = re.search(
+		SCORE_REGEX,
+		cell_html
+	)
+	return cell_score
+
+def extract_hints(soup, kernel_language, cell_html):
 	if kernel_language == "R":
 		hint_regex = R_HINT_REGEX
-		not_implemented_regex = R_NOT_IMPLEMENTED_REGEX
+		hints = re.findall(
+			hint_regex,
+			cell_html,
+		)	
 	elif kernel_language == "julia":
 		hint_regex = JULIA_HINT_REGEX
-		not_implemented_regex = JULIA_NOT_IMPLEMENTED_REGEX
-	else:
-		hint_regex = PYTHON_HINT_REGEX
-		not_implemented_regex = PYTHON_NOT_IMPLEMENTED_REGEX
+		hints = re.findall(
+			hint_regex,
+			cell_html,
+		)	
+	else:  # Python
+		hint_elems = soup.select("span.k:contains(assert) ~ span.p:contains(',') + span[class*=s]")
+		hints = [elem.get_text(strip=True) for elem in hint_elems]
+	return hints
 
+def extract_not_implemented(soup, kernel_language):
+	if kernel_language == "R":
+		not_implemented = soup.find("span", string=".NotYetImplemented()")
+	elif kernel_language == "julia":
+		not_implemented = soup.find("span", string="Not Yet Implemented")
+	else:  # Python
+		not_implemented = soup.find("span", string="NotImplementedError")
+
+	return not_implemented
+
+def construct_output_message(output, testCaseResults, cell_name, cell_score, hints, cell_number, is_not_implemented):
+	if cell_score is not None:
+
+		testCaseResult = {
+			"testName": cell_name,
+			"result": "ERROR",
+		}
+		cell_score_numerator = float(cell_score.group(1))
+		cell_score_denominator = float(cell_score.group(2))
+
+		# Construct the output message
+		if cell_score_denominator == 0:
+			output += CELL_ERROR_MESSAGE
+		elif cell_score_numerator == cell_score_denominator:
+			output += CELL_PASSED_MESSAGE
+			testCaseResult["result"] = "PASS"
+		else:
+			output += CELL_FAILED_MESSAGE
+			if len(hints) > 0:
+				output += "Instructor hints: \n"
+			count = 1
+			for hint in hints:
+				output += f"\t{count}. {hint}\n"
+				count += 1
+
+			testCaseResult["result"] = "NO_ATTEMPT" if is_not_implemented else "FAIL"
+		testCaseResult["testIndex"] = cell_number
+		testCaseResults.append(testCaseResult)
+
+		# Stylize output
+		output = stylize_output(output)
+	return output
+
+# Method to handle all of the feedback processing
+def redact_feedback(match_obj, options, kernel_language, testCaseResults):
 	cell_html = match_obj.group()
 	soup = BeautifulSoup(cell_html, 'html.parser')
 
 	# Process cell traceback only if option is set. Not having this set will leave assignment vulnerable to notebook dump
 	if options['hideTraceback']:
-		# print("Cell HTML: ", cell_html)
 		# Initialize the output string builder
 		output = ""
 
-		cell_name = re.search(
-			NAME_REGEX,
-			cell_html
-		)
-		print("Cell Name: ", cell_name)
-
-		# Get score
-		cell_score = re.search(
-			SCORE_REGEX,
-			cell_html
-		)
-		print("Cell Score:", cell_score)
+		#Get cell name, score and number
+		cell_name = extract_cell_name(soup)
+		cell_score = extract_score(cell_html)
+		cell_number = extract_cell_number(soup)
 
 		# Check whether we see any "Not Implemented" error to determine whether the student attempted this cell
-		is_not_implemented = re.search(
-			not_implemented_regex,
-			cell_html
-		)
-		print("Not impletemented: ", is_not_implemented)
+		is_not_implemented = extract_not_implemented(soup, kernel_language)
 
 		# Look for instructor hints
-		hints = re.findall(
-			hint_regex,
-			cell_html,
-		)		
-		print("Hints: ", hints)
-
-		# Get cell number
-		input_prompt = soup.find("div", class_="prompt input_prompt")
-		matched_number = CELL_NUM_REGEX.search(input_prompt.string)
-
-		#Testing
-		if matched_number:
-			cell_number = int(matched_number.group(1))
-			print(f"Cell number: {cell_number}")
-		else:
-			print("No cell number found")
-
-		# Use score to check whether all test cases passed
-		if cell_score is not None:
-			testCaseResult = {
-				"testName": cell_name.group(1),
-				"result": "ERROR",
-			}
-			print("Test Case Res", testCaseResult)
-			cell_score_numerator = float(cell_score.group(1))
-			cell_score_denominator = float(cell_score.group(2))
-			print(f"{cell_score_denominator} / {cell_score_denominator}")
-			# Construct the output message
-			if cell_score_denominator == 0:
-				output += CELL_ERROR_MESSAGE
-			elif cell_score_numerator == cell_score_denominator:
-				output += CELL_PASSED_MESSAGE
-				testCaseResult["result"] = "PASS"
-			else:
-				output += CELL_FAILED_MESSAGE
-				if len(hints) > 0:
-					output += "Instructor hints: \n"
-				count = 1
-				for hint in hints:
-					output += f"\t{count}. {hint}\n"
-					count += 1
-
-				testCaseResult["result"] = "NO_ATTEMPT" if is_not_implemented else "FAIL"
-			testCaseResult["testIndex"] = matched_number
-			testCaseResults.append(testCaseResult)
-			
-			# Stylize output
-			output = stylize_output(output)
+		hints = extract_hints(soup, kernel_language, cell_html)
+		
+		# Construct the output message
+		output = construct_output_message(output, testCaseResults, cell_name, cell_score, hints, cell_number, is_not_implemented)
 
 		# Remove all generated output so we can use our own
 		cell_html = re.sub(
@@ -194,7 +211,6 @@ def redact_feedback(match_obj, options, kernel_language, testCaseResults):
 		)
 
 	return cell_html
-
 # Add -intense class to colors to increase contrast
 def intensify_colors(match):
 
@@ -263,7 +279,6 @@ def get_processed_feedback(processed_feedback, options, kernel_language):
 		lambda match: redact_feedback(match, options, kernel_language, testCaseResults),
 		processed_feedback,
 	)
-	# print("Redacted feedback: ", redacted_feedback)
 	# Get above accessibility contrast threshold
 	redacted_feedback = fix_contrast(redacted_feedback)
 
@@ -373,7 +388,6 @@ if __name__ == "__main__":
 		print("Invalid number of arguments provided")
 		exit(1)
 
-	print("Args: ", sys.argv)
 	# username for the learner
 	nbgrader_learner = sys.argv[1]
 	# the name of the assignment (folder) in nbgrader formgrader
@@ -401,7 +415,7 @@ if __name__ == "__main__":
 		}
 
 	kernel_language = kernel_language_raw.strip('"')
-	print("Max Score: ", coursera_part_max_score)
+
 	clean_feedback(
 		nbgrader_learner, 
 		assignment_name, 
