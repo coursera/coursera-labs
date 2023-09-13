@@ -6,6 +6,8 @@ from scoreCalculator import scoreCalculator
 
 from bs4 import BeautifulSoup
 
+import logging
+
 # Regular Expressions for HTML to get redacted
 
 # Matches HTML that signifies the beginning and end of HIDDEN TESTS
@@ -26,7 +28,7 @@ CELL_NUM_REGEX = re.compile(r"\[(\d+)\]")
 # capture groups here would involve adding a lot of unreadable complexity to
 # accurately find the correct matching end tag).
 # By using look-behind and look-ahead, we get the contents of the cell itself.
-CELL_BORDER_REGEX = r'(?<=<div class="cell border-box-sizing code_cell rendered">)[\w\W]*?(?=(</div>\s*<div class="cell )|(</div>\s*){6}</body>)'
+CELL_BORDER_REGEX = r'(?s)<div class="cell border-box-sizing code_cell rendered">(.*?)<\/div>\s*<\/div>\s*<\/div>\s*<\/div>\s*<\/div>\s*<\/div>\s*<\/div>'
 
 # Matches on the HTML that wraps an entire output section. 
 # We don't technically need to specify all of the opening tags, but they are
@@ -40,17 +42,15 @@ R_TEST_FUNCTIONS = ["test_that", "stop"]
 R_TEST_FUNCTIONS_STRING = '|'.join(R_TEST_FUNCTIONS)
 
 # We need the surrounding context because span class="s" is a generic class for strings
-PYTHON_HINT_REGEX = rf'<span class="k">assert[\w\W]+?<span class="p">.*?,</span>\s*{STRING_REGEX}'
 R_HINT_REGEX = rf'<span class="nf">(?:{R_TEST_FUNCTIONS_STRING})</span>\s*<span class="p">\(</span>[\w\W]*?{STRING_REGEX}\s*'
-JULIA_HINT_REGEX = rf'<span class="nd">@testset</span>\s*{STRING_REGEX}\s*<span class="k">begin</span>'
 
 PYTHON_NOT_IMPLEMENTED_REGEX = rf'<span class="ansi-red-fg">NotImplementedError</span>'
 R_NOT_IMPLEMENTED_REGEX = rf'.NotYetImplemented()'
 JULIA_NOT_IMPLEMENTED_REGEX = rf'Not Yet Implemented'
 
-CELL_PASSED_MESSAGE = "<span class='ansi-green-intense-fg ansi-bold'>Congratulations! All test cases in this cell passed.</span>\n"
-CELL_FAILED_MESSAGE = "<span class='ansi-red-intense-fg ansi-bold'>One or more test cases in this cell did not pass.</span>\n"
-CELL_ERROR_MESSAGE = "<span class='ansi-black-fg ansi-bold'>Total possible points in this cell was 0.</span>\n"
+CELL_PASSED_MESSAGE = "<span style='color: green; font-weight: bold;'>Congratulations! All test cases in this cell passed.</span>\n"
+CELL_FAILED_MESSAGE = "<span style='color: red; font-weight: bold;'>One or more test cases in this cell did not pass.</span>\n"
+CELL_ERROR_MESSAGE = "<span style='color: black; font-weight: bold;>Total possible points in this cell was 0.</span>\n"
 
 # Get the path for the clean file
 def get_clean_path(file_path):
@@ -83,22 +83,18 @@ def stylize_output(message):
 	return message
 
 def extract_cell_name(soup):
-	cell_name_element = soup.find('a')
-	if cell_name_element:
-		return cell_name_element['name']
-	else:
-		return None
+    cell_name_element = soup.find('a')
+    return cell_name_element.get('name') if cell_name_element else None
 
 def extract_cell_number(soup):
-	input_prompt = soup.find("div", class_="prompt input_prompt")
-	matched_number = CELL_NUM_REGEX.search(input_prompt.string)
+    input_prompt = soup.find("div", class_="prompt input_prompt")
+    matched_number = CELL_NUM_REGEX.search(input_prompt.string)
+    cell_number = int(matched_number.group(1)) if matched_number else None
 
-	#Testing
-	if matched_number:
-		cell_number = int(matched_number.group(1))
-		return cell_number
-	else: 
-		return None
+    if not matched_number:
+        logging.warning("Cell number search unsuccessful")
+
+    return cell_number
 
 def extract_score(cell_html):
 	cell_score = re.search(
@@ -113,27 +109,41 @@ def extract_hints(soup, kernel_language, cell_html):
 		hints = re.findall(
 			hint_regex,
 			cell_html,
-		)	
+		)
 	elif kernel_language == "julia":
-		hint_regex = JULIA_HINT_REGEX
-		hints = re.findall(
-			hint_regex,
-			cell_html,
-		)	
+		hints = []
+		testset_tags = soup.select("span:contains('@testset')")
+
+		# Iterate through the '@testset' elements
+		for tag in testset_tags:
+
+			sibling = tag.find_next_sibling()
+
+			# Iterate through the siblings until a 'span' containing 'begin' is encountered
+			while sibling and not (sibling.name == 'span' and sibling.has_attr('class') and 'k' in sibling['class'] and sibling.get_text(strip=True) == 'begin'):
+				# Check if the sibling element matches 'span[class*=s]'
+				if sibling.name == 'span' and sibling.has_attr('class') and any('s' in c for c in sibling['class']):
+					hints.append(sibling.get_text(strip=True).strip('\'"'))
+
+				sibling = sibling.find_next_sibling()
 	else:  # Python
 		hint_elems = soup.select("span.k:contains(assert) ~ span.p:contains(',') + span[class*=s]")
-		hints = [elem.get_text(strip=True) for elem in hint_elems]
+		hints = [elem.get_text(strip=True).strip('\'"') for elem in hint_elems]
 	return hints
 
-def extract_not_implemented(soup, kernel_language):
+def extract_not_implemented(cell_html, kernel_language):
 	if kernel_language == "R":
-		not_implemented = soup.find("span", string=".NotYetImplemented()")
+		not_implemented_regex = R_NOT_IMPLEMENTED_REGEX
 	elif kernel_language == "julia":
-		not_implemented = soup.find("span", string="Not Yet Implemented")
+		not_implemented_regex = JULIA_NOT_IMPLEMENTED_REGEX
 	else:  # Python
-		not_implemented = soup.find("span", string="NotImplementedError")
-
-	return not_implemented
+		not_implemented_regex = PYTHON_NOT_IMPLEMENTED_REGEX
+	
+	is_not_implemented = re.search(
+		not_implemented_regex,
+		cell_html
+	)
+	return is_not_implemented
 
 def construct_output_message(output, testCaseResults, cell_name, cell_score, hints, cell_number, is_not_implemented):
 	if cell_score is not None:
@@ -160,7 +170,7 @@ def construct_output_message(output, testCaseResults, cell_name, cell_score, hin
 				output += f"\t{count}. {hint}\n"
 				count += 1
 
-			testCaseResult["result"] = "NO_ATTEMPT" if is_not_implemented else "FAIL"
+			testCaseResult["result"] = "SKIP" if is_not_implemented else "FAIL"
 		testCaseResult["testIndex"] = cell_number
 		testCaseResults.append(testCaseResult)
 
@@ -169,8 +179,8 @@ def construct_output_message(output, testCaseResults, cell_name, cell_score, hin
 	return output
 
 # Method to handle all of the feedback processing
-def redact_feedback(match_obj, options, kernel_language, testCaseResults):
-	cell_html = match_obj.group()
+def redact_feedback(cell_html, options, kernel_language, testCaseResults):
+	cell_html = ''.join(str(item) for item in cell_html)
 	soup = BeautifulSoup(cell_html, 'html.parser')
 
 	# Process cell traceback only if option is set. Not having this set will leave assignment vulnerable to notebook dump
@@ -178,14 +188,13 @@ def redact_feedback(match_obj, options, kernel_language, testCaseResults):
 		# Initialize the output string builder
 		output = ""
 
-		#Get cell name, score and number
+		# Get cell name, score and number
 		cell_name = extract_cell_name(soup)
 		cell_score = extract_score(cell_html)
 		cell_number = extract_cell_number(soup)
 
 		# Check whether we see any "Not Implemented" error to determine whether the student attempted this cell
-		is_not_implemented = extract_not_implemented(soup, kernel_language)
-
+		is_not_implemented = extract_not_implemented(cell_html, kernel_language)
 		# Look for instructor hints
 		hints = extract_hints(soup, kernel_language, cell_html)
 		
@@ -198,7 +207,6 @@ def redact_feedback(match_obj, options, kernel_language, testCaseResults):
 			"",
 			cell_html
 		)
-
 		# Add our now stylized output to the HTML document
 		cell_html += output
 
@@ -273,12 +281,37 @@ def fix_contrast(contrasted_feedback):
 def get_processed_feedback(processed_feedback, options, kernel_language):
 	testCaseResults = []
 
+	soup = BeautifulSoup(processed_feedback, 'html.parser')
+	
 	# Breaks HTML in chunks per cell
-	redacted_feedback = re.sub(
-		CELL_BORDER_REGEX,
-		lambda match: redact_feedback(match, options, kernel_language, testCaseResults),
-		processed_feedback,
-	)
+	elements = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
+	for element in elements:
+		new_element = redact_feedback(element.contents, options, kernel_language, testCaseResults)
+
+		# Create a BeautifulSoup object from the new content
+		new_soup = BeautifulSoup(new_element, 'html.parser')
+		# Find the target elements
+		input = new_soup.find('div', class_='input')
+		output = new_soup.find('div', class_='output_wrapper')
+
+		# Create a new div
+		wrapper_div = new_soup.new_tag('div')
+		wrapper_div['class'] = 'cell border-box-sizing code_cell rendered'
+		input.insert_before(wrapper_div)
+
+		# Append the target elements to the new div
+		if input:
+			wrapper_div.append(input.extract())
+		if output: 
+			wrapper_div.append(output.extract())
+
+		# Replace the first target element with the wrapper
+		# input.replace_with(wrapper_div)
+		element.replace_with(new_soup)
+
+	
+	redacted_feedback = str(soup)
+
 	# Get above accessibility contrast threshold
 	redacted_feedback = fix_contrast(redacted_feedback)
 
@@ -347,6 +380,14 @@ def get_updated_score(clean_feedback, max_score):
 
 	return clean_text
 
+## TESTING
+def print_elements_in_directory(directory):
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            print(os.path.join(root, name))
+        for name in dirs:
+            print(os.path.join(root, name))
+
 # Create a clean feedback version of a file
 def clean_feedback(
 	nbgrader_learner, assignment_name, decoded_feedback, notebook_filename, options, kernel_language, max_score):
@@ -356,6 +397,9 @@ def clean_feedback(
 	clean_path = get_clean_path(file_path)
 
 	# Get the original text then process it
+	print(f"File path scrub:{file_path}")
+	print_elements_in_directory('feedback/courseraLearner/')
+
 	orig_text = get_feedback_text(file_path)
 	(clean_feedback, testCaseResults) = get_processed_feedback(orig_text, options, kernel_language)
 	clean_text = get_updated_score(clean_feedback, max_score)
@@ -379,6 +423,9 @@ def clean_feedback(
 	# Write the new cleaned file
 	with open(clean_path, "w") as clean_file:
 		clean_file.write(clean_text)
+		print(f"Writing to :{clean_path}")
+
+	print(f"File path clean:{clean_path}")
 
 	scoreCalculator(assignment_name, notebook_filename, nbgrader_learner, testCaseResults)
 
@@ -413,7 +460,6 @@ if __name__ == "__main__":
 			"hideTraceback": True,
 			"hiddenTracebackText": "Traceback Redacted"
 		}
-
 	kernel_language = kernel_language_raw.strip('"')
 
 	clean_feedback(
@@ -423,4 +469,4 @@ if __name__ == "__main__":
 		notebook_filename, 
 		options, 
 		kernel_language, 
-		coursera_part_max_score)
+		100)

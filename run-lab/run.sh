@@ -7,7 +7,6 @@ BUILD_DIR="$(cd "$(dirname "$2")"; pwd)"
 BUILD_PATH="$BUILD_DIR/$(basename "$2")"
 
 ADD_SUBMIT_BUTTON=$3
-
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $BUILD_DIR:/$BUILD_DIR \

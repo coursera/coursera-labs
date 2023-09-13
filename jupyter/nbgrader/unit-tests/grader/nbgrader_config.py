@@ -1,3 +1,3 @@
 c = get_config()
 
-c.ExecutePreprocessor.timeout = -1
+c.Execute.timeout = 300

@@ -1,16 +1,5 @@
 #!/bin/bash
 
-# remove existing directory, so we can start fresh for demo purposes
-rm -rf /tmp/exchange
-rm -rf /usr/local/share/nbgrader/exchange
-
-# create the exchange directory, with write permissions for everyone
-mkdir /tmp/exchange
-chmod ugo+rw /tmp/exchange
-
-mkdir /usr/local/share/nbgrader/exchange
-chmod ugo+rw /usr/local/share/nbgrader/exchange
-
 # Delete grader files
 rm -rf $GRADER_FILES_PATH
 

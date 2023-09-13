@@ -1,4 +1,4 @@
-import sys, re
+import sys, re, os
 from bs4 import BeautifulSoup
 
 # This works by doing the following:
@@ -30,6 +30,7 @@ class Result:
 
 # Read file into string
 def get_feedback_text(file_path):
+    print(f"Validate path: {file_path}")
     with open(file_path, "r") as feedback_file:
         feedback_text = feedback_file.read()
         return feedback_text
@@ -99,7 +100,6 @@ def check_cell_result(expected_cell_result, text, result):
             cell_result_str,
             text
         )
-
         if cell_result is None:
             result.feedback += "Cell result output does not match what is expected.\n"
             return False
@@ -160,8 +160,18 @@ def validate_cell(cell_text):
     else:
         return 1
 
+## TESTING
+def print_elements_in_directory(directory):
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            print(os.path.join(root, name))
+        for name in dirs:
+            print(os.path.join(root, name))
+
 # Driver method that takes the file, parses it, and runs the cell-by-cell tests
 def validate_feedback(file_path):
+    # print_elements_in_directory('./')
+
     feedback_text = get_feedback_text(file_path)
     S = BeautifulSoup(feedback_text, 'lxml')
 

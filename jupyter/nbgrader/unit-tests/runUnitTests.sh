@@ -18,7 +18,7 @@ kernel_language="$(jq '.metadata.kernelspec.language' "submitted/$NBGRADER_LEARN
 
 # Scrub given feedback file to remove hidden tests and tracebacks
 # Checks options.json for toggling on/off hiding tests or tracebacks
-python scrub.py "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK" 100 $kernel_language
+python scrub.py "$NBGRADER_LEARNER" "$ASSIGNMENT_NAME" "$DECODED_FEEDBACK" 100 "$kernel_language" "$NOTEBOOK_FILENAME"
 
 # Copy the cleaned feedback to the shared directory
 cp "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK.clean" ./"$1"_htmlFeedback.html
