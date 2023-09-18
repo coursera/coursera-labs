@@ -26,8 +26,10 @@ RUN mkdir -p $NBGRADER_FILES_PATH
 COPY nbgrader-files/nbgrader-setup.sh /usr/local/bin/start-notebook.d/nbgrader-setup.sh
 COPY nbgrader-files/ $NBGRADER_FILES_PATH
 RUN chmod 777 -R $NBGRADER_FILES_PATH/
+
 # Add grid files
 COPY grader/ $GRADER_FILES_PATH
+RUN chmod 755 -R $GRADER_FILES_PATH
 
 # Add unit testing files
 COPY unit-tests/ $UNIT_TEST_FILES_PATH

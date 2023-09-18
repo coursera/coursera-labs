@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NGINX_FILES_PATH=/home/nginx
@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     openssh-server \
     # Python SDK
     python3 \
-    python-dev \
+    python3-dev \
     python3-pip \
     # Java 11 SDK
     default-jre-headless \
@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     valgrind \
     gdb \
     # C# SDK
-    mono-complete \
+    # mono-complete \
     # Ruby SDK
     ruby-full \
     # PHP SDK
@@ -48,7 +48,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean
 
 # Node SDK
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/nodesource.gpg \
+    && echo "deb https://deb.nodesource.com/node_18.x $(lsb_release -cs) main" > /etc/apt/sources.list.d/nodesource.list \
+    && echo "deb-src https://deb.nodesource.com/node_18.x $(lsb_release -cs) main" >> /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
     && apt-get install --no-install-recommends -y nodejs \
     && npm install -g typescript
 
@@ -97,7 +100,7 @@ ENV LANG en_US.utf8
 ENV DISABLE_TELEMETRY true
 
 # actual install of code server
-ENV CODE_VERSION="3.12.0"
+ENV CODE_VERSION="4.16.1"
 RUN curl -fsSL https://code-server.dev/install.sh | bash /dev/stdin --version $CODE_VERSION
 
 # Set up User
@@ -292,4 +295,4 @@ CMD ["start.sh"]
 # This will generally always be needed for React apps
 RUN npm install react-scripts --global \
     # Needed for reverse-proxy easy config
-    && npm install nginx-conf --global 
+    && npm install nginx-conf --global  

@@ -29,6 +29,7 @@ su -c "cp -rn /tmp/nginx-files/. /home/nginx" - coder
 
 # install nginx-conf npm package for reverse proxy config script
 cd /home/nginx
+chmod 777 /home/npm-global/lib/node_modules
 su -c "npm install --global" - coder
 
 # link reverse-proxy from mount point to location where it actually takes effect
