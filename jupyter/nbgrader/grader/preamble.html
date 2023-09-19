@@ -132,7 +132,7 @@
 
     // Create point total el
     const totalScore = document.createElement('p');
-    totalScore.innerText = `${earnedPoints.toFixed(2)} / ${maxPoints.toFixed(2)} points earned`;
+    totalScore.innerText = `${Math.round(earnedPoints)} / ${Math.round(maxPoints)} points earned`;
     navContainer.appendChild(totalScore);
 
     // Create pass fail count els

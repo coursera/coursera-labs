@@ -21,12 +21,23 @@ HINT_REGEX = r'\t.*\n'
 
 # Matches the cell number
 CELL_NUMBER_REGEX = r'<div class="prompt input_prompt">In\s+\[(\d+)\]:<\/div>'
+CELL_NUM_REGEX = re.compile(r"\[(\d+)\]")
 
 # Result class to help store unit test results/feedback
 class Result:
     def __init__(self):
         self.feedback = ""
         self.passed = True
+
+def extract_cell_number(soup):
+    input_prompt = soup.find("div", class_="prompt input_prompt")
+    matched_number = CELL_NUM_REGEX.search(input_prompt.string)
+    cell_number = int(matched_number.group(1)) if matched_number else None
+
+    if not matched_number:
+        print("Cell number search unsuccessful")
+
+    return cell_number
 
 # Read file into string
 def get_feedback_text(file_path):
@@ -119,13 +130,10 @@ def check_cell_result(expected_cell_result, text, result):
 # Test a specific cell
 def validate_cell(cell_text):
     result = Result()
+    print("Cell text:", cell_text)
 
     # Get cell number for identification purposes
-    cell_num = re.search(
-        CELL_NUMBER_REGEX,
-        cell_text
-    ).group(1)
-
+    cell_num = extract_cell_number(BeautifulSoup(cell_text, 'html.parser'))
     result.feedback += f"----------- Feedback for cell {cell_num} -----------\n"
 
     # Get the expected results for this particular cell

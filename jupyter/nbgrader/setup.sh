@@ -26,5 +26,6 @@ then
 else
 	# Launch workspace
 	cd $JN_WORK_DIR
+	echo "Launching workspace"
 	tini -- jupyter lab --ip='*' --port=8888 --no-browser --allow-root
 fi

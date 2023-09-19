@@ -217,8 +217,28 @@ def redact_feedback(cell_html, options, kernel_language, testCaseResults):
 			'<span>' + options['hiddenTestText'] + '</span>',
 			cell_html,
 		)
+	# Create a BeautifulSoup object from the new content
+	new_soup = BeautifulSoup(cell_html, 'html.parser')
 
-	return cell_html
+	# Cell align
+	# input_prompt = new_soup.find('div', class_='prompt input_prompt')
+	# input_prompt['style'] = 'display: inline-block; width: 5%; vertical-align: top;'
+
+	# Find the target elements
+	input = new_soup.find('div', class_='input')
+	output = new_soup.find('div', class_='output_wrapper')
+
+	# Create a new div
+	wrapper_div = new_soup.new_tag('div')
+	wrapper_div['class'] = 'cell border-box-sizing code_cell rendered'
+	input.insert_before(wrapper_div)
+
+	# Append the target elements to the new div
+	if input:
+		wrapper_div.append(input.extract())
+	if output: 
+		wrapper_div.append(output.extract())
+	return new_soup
 # Add -intense class to colors to increase contrast
 def intensify_colors(match):
 
@@ -277,36 +297,26 @@ def fix_contrast(contrasted_feedback):
 
 	return contrasted_feedback
 
+def round_numbers_in_fraction(match):
+    num1, num2 = map(float, (match.group(1), match.group(2)))
+    return f"{round(num1)} / {round(num2)}"
+
 # Remove hidden tests and traceback from feedback html
 def get_processed_feedback(processed_feedback, options, kernel_language):
 	testCaseResults = []
-
 	soup = BeautifulSoup(processed_feedback, 'html.parser')
 	
+	# Cell align
+	# style_tags = soup.find_all(lambda tag: tag.name == 'style' and not tag.has_attr('type'))
+	# for style_tag in style_tags:
+	# 	style_tag.string = style_tag.string.replace(
+	# 		"div.nbgrader_cell {\n    width: 100%;\n}",
+	# 		"div.nbgrader_cell {\n    width: 80%;\n 	display: inline-block\n}")
+
 	# Breaks HTML in chunks per cell
 	elements = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
 	for element in elements:
-		new_element = redact_feedback(element.contents, options, kernel_language, testCaseResults)
-
-		# Create a BeautifulSoup object from the new content
-		new_soup = BeautifulSoup(new_element, 'html.parser')
-		# Find the target elements
-		input = new_soup.find('div', class_='input')
-		output = new_soup.find('div', class_='output_wrapper')
-
-		# Create a new div
-		wrapper_div = new_soup.new_tag('div')
-		wrapper_div['class'] = 'cell border-box-sizing code_cell rendered'
-		input.insert_before(wrapper_div)
-
-		# Append the target elements to the new div
-		if input:
-			wrapper_div.append(input.extract())
-		if output: 
-			wrapper_div.append(output.extract())
-
-		# Replace the first target element with the wrapper
-		# input.replace_with(wrapper_div)
+		new_soup = redact_feedback(element.contents, options, kernel_language, testCaseResults)
 		element.replace_with(new_soup)
 
 	
@@ -388,6 +398,11 @@ def print_elements_in_directory(directory):
         for name in dirs:
             print(os.path.join(root, name))
 
+def round_numbers_in_fraction(match):
+	print("FOUND MATCH: ", match)
+	num1, num2 = map(float, (match.group(1), match.group(2)))
+	return f"{round(num1)} / {round(num2)}"
+
 # Create a clean feedback version of a file
 def clean_feedback(
 	nbgrader_learner, assignment_name, decoded_feedback, notebook_filename, options, kernel_language, max_score):
@@ -419,7 +434,22 @@ def clean_feedback(
 		f"<body>{score_input}",
 		clean_text
 	)
-	
+
+	# print(clean_text)
+	# soup = BeautifulSoup(clean_text, 'html.parser')
+
+	# # Find the div with class 'col-sm-3'
+	# col_sm_3_div = soup.find('div', class_='col-sm-3')
+
+	# # Find span and p elements containing fractions and process them
+	# elements_to_process = col_sm_3_div(['span', 'p'])
+
+	# for element in elements_to_process:
+	# 	text = element.get_text()
+	# 	print("PROCESSING: ", element)
+	# 	updated_text = re.sub(r"(\d+\.\d+) *\/ *(\d+\.\d+)", round_numbers_in_fraction, text)
+	# 	element.replace_with(updated_text)
+
 	# Write the new cleaned file
 	with open(clean_path, "w") as clean_file:
 		clean_file.write(clean_text)

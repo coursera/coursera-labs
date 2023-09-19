@@ -3,27 +3,13 @@
   "httpPort": 8888,
   "mounts": [
     {
-      "path": "/shared/grader"
-    },
-    {
-      "path": "/shared/submission"
-    },
-    {
-      "path": "/shared"
+      "path": "/home/jovyan/work"
     }
   ],
   "environmentVars": [
     {
-      "name": "assignmentName",
-      "value": "Test_Files"
-    },
-    {
-      "name": "filename",
-      "value": "python_tests.ipynb"
-    },
-    {
-      "name": "notebookId",
-      "value": "python_tests.ipynb"
+      "name": "WORKSPACE_TYPE",
+      "value": "instructor"
     }
   ]
 }
