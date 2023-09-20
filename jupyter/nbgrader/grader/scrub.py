@@ -218,27 +218,14 @@ def redact_feedback(cell_html, options, kernel_language, testCaseResults):
 			cell_html,
 		)
 	# Create a BeautifulSoup object from the new content
-	new_soup = BeautifulSoup(cell_html, 'html.parser')
+	redacted_soup = BeautifulSoup(cell_html, 'html.parser')
 
 	# Cell align
 	# input_prompt = new_soup.find('div', class_='prompt input_prompt')
 	# input_prompt['style'] = 'display: inline-block; width: 5%; vertical-align: top;'
 
-	# Find the target elements
-	input = new_soup.find('div', class_='input')
-	output = new_soup.find('div', class_='output_wrapper')
-
-	# Create a new div
-	wrapper_div = new_soup.new_tag('div')
-	wrapper_div['class'] = 'cell border-box-sizing code_cell rendered'
-	input.insert_before(wrapper_div)
-
-	# Append the target elements to the new div
-	if input:
-		wrapper_div.append(input.extract())
-	if output: 
-		wrapper_div.append(output.extract())
-	return new_soup
+	create_cell_wrapper_div(redacted_soup)
+	return redacted_soup
 # Add -intense class to colors to increase contrast
 def intensify_colors(match):
 
@@ -320,6 +307,7 @@ def get_processed_feedback(processed_feedback, options, kernel_language):
 		element.replace_with(new_soup)
 
 	
+	soup = apply_wrapper_on_all_cells(soup)
 	redacted_feedback = str(soup)
 
 	# Get above accessibility contrast threshold
@@ -403,6 +391,77 @@ def round_numbers_in_fraction(match):
 	num1, num2 = map(float, (match.group(1), match.group(2)))
 	return f"{round(num1)} / {round(num2)}"
 
+def create_cell_wrapper_div(soup):
+	# Get the input and output elements
+	input = soup.find('div', class_='input')
+	output = soup.find('div', class_='output_wrapper')
+
+	# Create a new wrapping div
+	wrapper_div = soup.new_tag('div')
+	wrapper_div['class'] = 'cell border-box-sizing code_cell rendered'
+	
+	#Inserts wrapper div directly before the input element in the DOM tree 
+	input.insert_before(wrapper_div)
+
+	# Append the target elements to the new wrapping div
+	if input:
+		wrapper_div.append(input.extract())
+	if output: 
+		wrapper_div.append(output.extract())
+	return soup
+
+def wrap_cell_elements(soup, cell):
+    # Locate the input_prompt div
+    input_prompt = cell.find('div', class_='input_prompt')
+
+    # Create a new wrapper div
+    wrapper_div = soup.new_tag('div')
+    wrapper_div['class'] = 'wrapper'
+
+    # Insert wrapper div before the input_prompt div in the DOM tree
+    input_prompt.insert_before(wrapper_div)
+
+    # Move input_prompt and cell divs inside wrapper_div
+    wrapper_div.append(input_prompt.extract())
+    wrapper_div.append(cell.extract())
+
+    return soup
+
+
+def apply_wrapper_on_all_cells(soup):
+    # Locate the parent div with class="container" and id="notebook-container"
+    parent_div = soup.find('div', class_='container', id='notebook-container')
+
+    # Iterate through all 'cell border-box-sizing code_cell rendered' elements and wrap them
+    cells = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
+    # for cell in cells:
+    #     wrap_cell_elements(soup, cell)
+
+    # Add the given styling
+    style_content = '''
+    .wrapper {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .input_prompt {
+        width: 10%;
+        white-space: nowrap;
+        min-width: fit-content;
+        margin-right: 1em;
+    }
+
+    .border-box-sizing.code_cell.rendered {
+        width: 90%;
+    }
+    '''
+
+    style_tag = soup.new_tag('style')
+    style_tag.string = style_content
+    soup.head.append(style_tag)
+
+    return soup
+
 # Create a clean feedback version of a file
 def clean_feedback(
 	nbgrader_learner, assignment_name, decoded_feedback, notebook_filename, options, kernel_language, max_score):
@@ -412,7 +471,6 @@ def clean_feedback(
 	clean_path = get_clean_path(file_path)
 
 	# Get the original text then process it
-	print(f"File path scrub:{file_path}")
 	print_elements_in_directory('feedback/courseraLearner/')
 
 	orig_text = get_feedback_text(file_path)
@@ -435,27 +493,10 @@ def clean_feedback(
 		clean_text
 	)
 
-	# print(clean_text)
-	# soup = BeautifulSoup(clean_text, 'html.parser')
-
-	# # Find the div with class 'col-sm-3'
-	# col_sm_3_div = soup.find('div', class_='col-sm-3')
-
-	# # Find span and p elements containing fractions and process them
-	# elements_to_process = col_sm_3_div(['span', 'p'])
-
-	# for element in elements_to_process:
-	# 	text = element.get_text()
-	# 	print("PROCESSING: ", element)
-	# 	updated_text = re.sub(r"(\d+\.\d+) *\/ *(\d+\.\d+)", round_numbers_in_fraction, text)
-	# 	element.replace_with(updated_text)
-
 	# Write the new cleaned file
 	with open(clean_path, "w") as clean_file:
 		clean_file.write(clean_text)
 		print(f"Writing to :{clean_path}")
-
-	print(f"File path clean:{clean_path}")
 
 	scoreCalculator(assignment_name, notebook_filename, nbgrader_learner, testCaseResults)
 
@@ -491,6 +532,7 @@ if __name__ == "__main__":
 			"hiddenTracebackText": "Traceback Redacted"
 		}
 	kernel_language = kernel_language_raw.strip('"')
+	coursera_part_max_score = 100
 
 	clean_feedback(
 		nbgrader_learner, 
@@ -499,4 +541,5 @@ if __name__ == "__main__":
 		notebook_filename, 
 		options, 
 		kernel_language, 
-		100)
+		coursera_part_max_score
+		)
