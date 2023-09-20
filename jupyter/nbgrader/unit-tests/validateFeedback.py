@@ -1,4 +1,4 @@
-import sys, re, os
+import sys, re, os, logging
 from bs4 import BeautifulSoup
 
 # This works by doing the following:
@@ -31,11 +31,12 @@ class Result:
 
 def extract_cell_number(soup):
     input_prompt = soup.find("div", class_="prompt input_prompt")
+    print(input_prompt.prettify())
     matched_number = CELL_NUM_REGEX.search(input_prompt.string)
     cell_number = int(matched_number.group(1)) if matched_number else None
 
     if not matched_number:
-        print("Cell number search unsuccessful")
+        logging.warning("Cell number search unsuccessful")
 
     return cell_number
 
@@ -130,7 +131,7 @@ def check_cell_result(expected_cell_result, text, result):
 # Test a specific cell
 def validate_cell(cell_text):
     result = Result()
-    # print("Cell text:", cell_text)
+    print("Cell text:", cell_text)
 
     # Get cell number for identification purposes
     cell_num = extract_cell_number(BeautifulSoup(cell_text, 'html.parser'))
@@ -184,7 +185,7 @@ def validate_feedback(file_path):
     S = BeautifulSoup(feedback_text, 'lxml')
 
     # This gets a list of code cells
-    cells = S.find_all(class_= 'cell border-box-sizing code_cell rendered')
+    cells = S.find_all(class_= 'cell-wrapper')
 
     passed_cells = 0
 

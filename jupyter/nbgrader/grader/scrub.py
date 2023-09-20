@@ -172,7 +172,6 @@ def construct_output_message(output, testCaseResults, cell_name, cell_score, hin
 
 			testCaseResult["result"] = "SKIP" if is_not_implemented else "FAIL"
 		testCaseResult["testIndex"] = cell_number
-		print(f"Cell number here: {cell_number}")
 		testCaseResults.append(testCaseResult)
 
 		# Stylize output
@@ -398,17 +397,17 @@ def create_cell_wrapper_div(soup):
 	output = soup.find('div', class_='output_wrapper')
 
 	# Create a new wrapping div
-	wrapper_div = soup.new_tag('div')
-	wrapper_div['class'] = 'cell border-box-sizing code_cell rendered'
+	input_output_div = soup.new_tag('div')
+	input_output_div['class'] = 'cell border-box-sizing code_cell rendered'
 	
 	#Inserts wrapper div directly before the input element in the DOM tree 
-	input.insert_before(wrapper_div)
+	input.insert_before(input_output_div)
 
 	# Append the target elements to the new wrapping div
 	if input:
-		wrapper_div.append(input.extract())
+		input_output_div.append(input.extract())
 	if output: 
-		wrapper_div.append(output.extract())
+		input_output_div.append(output.extract())
 	return soup
 
 def wrap_cell_elements(soup, cell):
@@ -417,7 +416,7 @@ def wrap_cell_elements(soup, cell):
 
     # Create a new wrapper div
     wrapper_div = soup.new_tag('div')
-    wrapper_div['class'] = 'wrapper'
+    wrapper_div['class'] = 'cell_wrapper'
 
     # Insert wrapper div before the input_prompt div in the DOM tree
     cell.insert_before(wrapper_div)
@@ -431,11 +430,6 @@ def wrap_cell_elements(soup, cell):
 
     # Insert the input_prompt div before the nbgrader_cell div
     cell.insert_before(input_prompt)
-    # Move input_prompt and cell divs inside wrapper_div
-    # wrapper_div.append(input_prompt.extract())
-    # wrapper_div.append(cell.extract())
-
-    # return soup
 
 
 def apply_wrapper_on_all_cells(soup):
@@ -523,15 +517,6 @@ def clean_feedback(
 		clean_text
 	)
 	
-	soup = BeautifulSoup(clean_text, 'html.parser')
-
-	target_div = soup.find('div', class_='col-sm-3', style='overflow: auto;')
-
-	if target_div is not None:
-		# Print the contents of the target div
-		print(target_div.contents)
-	else:
-		print("Specified div tag not found")
 	# Write the new cleaned file
 	with open(clean_path, "w") as clean_file:
 		clean_file.write(clean_text)
