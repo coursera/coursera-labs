@@ -19,9 +19,10 @@ elif [ "${WORKSPACE_TYPE}" = "test" ]
 then
 	# Run unit tests
 	$UNIT_TEST_FILES_PATH/setupUnitTests.sh
-	$UNIT_TEST_FILES_PATH/runUnitTests.sh julia
 	$UNIT_TEST_FILES_PATH/runUnitTests.sh python
 	$UNIT_TEST_FILES_PATH/runUnitTests.sh r
+	$UNIT_TEST_FILES_PATH/runUnitTests.sh julia
+
 	# Clean up
 	rm -rf unit-test-env
 else

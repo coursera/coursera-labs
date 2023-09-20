@@ -1,7 +1,7 @@
 <script>
   const SCORE_REGEX = /.*\(Score: (\d+\.\d+) \/ (\d+\.\d+)\)/gm;
   const TITLE_REGEX = /^(.*)\s\(.*$/gm;
-  const NUMERATION_REGEX = /In&nbsp;\[[\S\s]*?(<div class="cell-wrapper">|$)/gm;
+  const NUMERATION_REGEX = /In&nbsp;\[[\S\s]*?(<div class="cell_wrapper">|$)/gm;
 
   // Generate a cell object
   /**
@@ -30,15 +30,12 @@
 
   // Helper function to get the correct cell number for the left panel
   function getCellNumber(href, numerationArray) {
-    console.log(href)
     // Remove the preceding # to use href as a matching expression
     href = href.replace('#', '')
 
     // Search in the array for a match in cell href
     for (let i = 0; i < numerationArray.length; i++) {
       if (numerationArray[i].includes(href)) {
-        console.log("Includes:")
-        console.log(href)
         // Remove the prefix that is always present due to NUMERATION_REGEX
         const match = numerationArray[i].replace("In&nbsp;[", "");
         return parseInt(match);
@@ -195,7 +192,6 @@
     // We need to do it this way because querySelector only allows for CSS selectors,
     // which are not sufficient for what we want to do here.
     const numerationArray = docString.match(NUMERATION_REGEX);
-    console.log(numerationArray);
 
     // Convert each element to a JSON object
     let totalCellPoints = 0;

@@ -433,58 +433,58 @@ def wrap_cell_elements(soup, cell):
 
 
 def apply_wrapper_on_all_cells(soup):
-	# Locate the parent div with class="container" and id="notebook-container"
-	parent_div = soup.find('div', class_='container', id='notebook-container')
+    # Locate the parent div with class="container" and id="notebook-container"
+    parent_div = soup.find('div', class_='container', id='notebook-container')
 
-	# Iterate through all 'cell border-box-sizing code_cell rendered' elements and wrap them
-	cells = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
-	for cell in cells:
-		wrap_cell_elements(soup, cell)
+    # Iterate through all 'cell border-box-sizing code_cell rendered' elements and wrap them
+    cells = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
+    for cell in cells:
+        wrap_cell_elements(soup, cell)
 
-	# Find all style tags
-	style_tags = soup.find_all('style')
+    # Find all style tags
+    style_tags = soup.find_all('style')
 
-	# Initialize the target style_tag
-	target_style_tag = None
+    # Initialize the target style_tag
+    target_style_tag = None
 
-	# Iterate through all style tags to find the one containing 'div.prompt'
-	for style_tag in style_tags:
-		start = style_tag.string.find('div.prompt')
-		if start != -1:
-			target_style_tag = style_tag
-			break
+    # Iterate through all style tags to find the one containing 'div.prompt'
+    for style_tag in style_tags:
+        start = style_tag.string.find('div.prompt')
+        if start != -1:
+            target_style_tag = style_tag
+            break
 
-	if target_style_tag is not None:
-		# Find the positions of div.prompt rule in the target_style_tag
-		start = target_style_tag.string.find('div.prompt')
-		end = target_style_tag.string.find('}', start)
+    if target_style_tag is not None:
+        # Find the positions of div.prompt rule in the target_style_tag
+        start = target_style_tag.string.find('div.prompt')
+        end = target_style_tag.string.find('}', start)
 
-		# Split at the target rule
-		first_part = target_style_tag.string[:start]
-		second_part = target_style_tag.string[end + 1:]
+        # Split at the target rule
+        first_part = target_style_tag.string[:start]
+        second_part = target_style_tag.string[end + 1:]
 
-		style_content = '''
-		.wrapper {
-			display: flex;
-			align-items: flex-start;
-		}
+        style_content = '''
+        .cell_wrapper {
+            display: flex;
+            align-items: flex-start;
+        }
 
-		.input_prompt {
-			white-space: nowrap;
-			min-width: fit-content;
-			margin-right: 1em;
-		}
+        .input_prompt {
+            white-space: nowrap;
+            min-width: fit-content;
+            margin-right: 1em;
+        }
 
-		.border-box-sizing.code_cell.rendered {
-			width: 90%;
-		}
-		'''
+        .border-box-sizing.code_cell.rendered {
+            width: 90%;
+        }
+        '''
 
-		# Remove the triple quotes and rebuild the style tag content
-		target_style_tag.string = first_part + style_content.strip() + second_part
-	else:
-		print("div.prompt not found in any style tags")
-	return soup
+        # Remove the triple quotes and rebuild the style tag content
+        target_style_tag.string = first_part + style_content.strip() + second_part
+    else:
+        print("div.prompt not found in any style tags")
+    return soup
 
 # Create a clean feedback version of a file
 def clean_feedback(
@@ -496,7 +496,6 @@ def clean_feedback(
 
 	# Get the original text then process it
 	print_elements_in_directory('feedback/courseraLearner/')
-
 	orig_text = get_feedback_text(file_path)
 	(clean_feedback, testCaseResults) = get_processed_feedback(orig_text, options, kernel_language)
 	clean_text = get_updated_score(clean_feedback, max_score)
@@ -516,7 +515,7 @@ def clean_feedback(
 		f"<body>{score_input}",
 		clean_text
 	)
-	
+
 	# Write the new cleaned file
 	with open(clean_path, "w") as clean_file:
 		clean_file.write(clean_text)

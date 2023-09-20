@@ -47,6 +47,8 @@ fi
 
 # Autograde the submission with nbgrader
 nbgrader autograde --assignment="$ASSIGNMENT_NAME" --create --force &> autograde.log
+echo "Cat autograde"
+cat autograde.log
 
 # Generate the rich feedback for the assignment
 nbgrader generate_feedback "$ASSIGNMENT_NAME" &> feedback.log
