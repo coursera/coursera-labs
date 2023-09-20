@@ -5,7 +5,6 @@ then
 	# Delete grader files
 	rm -rf $GRADER_FILES_PATH
 	# Keep only validate extension for students
-	rm -rf $GRADER_FILES_PATH
     jupyter nbextension disable --sys-prefix create_assignment/main
     jupyter nbextension disable --sys-prefix formgrader/main --section=tree
 else 
