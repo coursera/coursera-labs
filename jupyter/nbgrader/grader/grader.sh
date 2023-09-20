@@ -44,9 +44,10 @@ else
     # Generate empty config
     nbgrader generate_config --quiet
 fi
-
+DECODED_SUBMISSION_FILENAME=${DECODED_SUBMISSION%.ipynb}
+echo "DECODED_SUBMISSION_FILENAME: ${DECODED_SUBMISSION_FILENAME}"
 # Autograde the submission with nbgrader
-nbgrader autograde --assignment="$ASSIGNMENT_NAME" --create --force &> autograde.log
+nbgrader autograde --assignment="$ASSIGNMENT_NAME" --notebook="$DECODED_SUBMISSION_FILENAME" --create --force # &> autograde.log
 
 # Generate the rich feedback for the assignment
 nbgrader generate_feedback "$ASSIGNMENT_NAME" &> feedback.log
@@ -55,7 +56,7 @@ cat feedback.log
 
 # Scrub given feedback file to remove hidden tests and tracebacks
 # Checks options.json for toggling on/off hiding tests or tracebacks
-python scrub.py "$NBGRADER_LEARNER" "$ASSIGNMENT_NAME" "$DECODED_FEEDBACK" "$courseraPartMaxScore" "$kernel_language" "$NOTEBOOK_FILENAME"
+python scrub.py "$NBGRADER_LEARNER" "$ASSIGNMENT_NAME" "$DECODED_FEEDBACK" 100 "$kernel_language" "$NOTEBOOK_FILENAME"
 
 # Copy the cleaned feedback to the shared directory
 cp "feedback/$NBGRADER_LEARNER/$ASSIGNMENT_NAME/$DECODED_FEEDBACK.clean" /shared/htmlFeedback.html

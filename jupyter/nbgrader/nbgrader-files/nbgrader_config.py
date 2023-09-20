@@ -10,4 +10,3 @@ c.ClearSolutions.code_stub = {
    "python": "# your code here\nraise NotImplementedError",
    "javascript": "// your code here\n"
 }
-

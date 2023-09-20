@@ -37,6 +37,12 @@ RUN chmod 777 -R $NBGRADER_FILES_PATH/
 COPY setup.sh /coursera/setup.sh
 RUN chmod 777 -R /coursera
 
+# Add unit testing files
+COPY unit-tests/ $UNIT_TEST_FILES_PATH
+COPY unit-tests/grader $UNIT_TEST_FILES_PATH/grader
+COPY unit-tests/grader/test-files $UNIT_TEST_FILES_PATH/grader/test-files
+RUN chmod 755 -R $UNIT_TEST_FILES_PATH
+
 # Add grid files
 COPY grader/ $GRADER_FILES_PATH
 RUN chmod 755 -R $GRADER_FILES_PATH
