@@ -130,7 +130,7 @@ def check_cell_result(expected_cell_result, text, result):
 # Test a specific cell
 def validate_cell(cell_text):
     result = Result()
-    print("Cell text:", cell_text)
+    # print("Cell text:", cell_text)
 
     # Get cell number for identification purposes
     cell_num = extract_cell_number(BeautifulSoup(cell_text, 'html.parser'))
@@ -163,7 +163,7 @@ def validate_cell(cell_text):
     result.passed &= check_cell_result(expected_cell_result, cell_text, result)
 
     if not result.passed:
-        print(result.feedback)
+        # print(result.feedback)
         return 0
     else:
         return 1

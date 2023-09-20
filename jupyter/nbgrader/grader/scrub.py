@@ -172,6 +172,7 @@ def construct_output_message(output, testCaseResults, cell_name, cell_score, hin
 
 			testCaseResult["result"] = "SKIP" if is_not_implemented else "FAIL"
 		testCaseResult["testIndex"] = cell_number
+		print(f"Cell number here: {cell_number}")
 		testCaseResults.append(testCaseResult)
 
 		# Stylize output
@@ -419,48 +420,77 @@ def wrap_cell_elements(soup, cell):
     wrapper_div['class'] = 'wrapper'
 
     # Insert wrapper div before the input_prompt div in the DOM tree
-    input_prompt.insert_before(wrapper_div)
+    cell.insert_before(wrapper_div)
+    wrapper_div.append(cell)
 
+    # Find the input_prompt and nbgrader_cell divs
+    input_prompt = cell.find('div', class_='prompt input_prompt')
+
+    # Extract the input_prompt div
+    input_prompt.extract()
+
+    # Insert the input_prompt div before the nbgrader_cell div
+    cell.insert_before(input_prompt)
     # Move input_prompt and cell divs inside wrapper_div
-    wrapper_div.append(input_prompt.extract())
-    wrapper_div.append(cell.extract())
+    # wrapper_div.append(input_prompt.extract())
+    # wrapper_div.append(cell.extract())
 
-    return soup
+    # return soup
 
 
 def apply_wrapper_on_all_cells(soup):
-    # Locate the parent div with class="container" and id="notebook-container"
-    parent_div = soup.find('div', class_='container', id='notebook-container')
+	# Locate the parent div with class="container" and id="notebook-container"
+	parent_div = soup.find('div', class_='container', id='notebook-container')
 
-    # Iterate through all 'cell border-box-sizing code_cell rendered' elements and wrap them
-    cells = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
-    # for cell in cells:
-    #     wrap_cell_elements(soup, cell)
+	# Iterate through all 'cell border-box-sizing code_cell rendered' elements and wrap them
+	cells = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
+	for cell in cells:
+		wrap_cell_elements(soup, cell)
 
-    # Add the given styling
-    style_content = '''
-    .wrapper {
-        display: flex;
-        align-items: flex-start;
-    }
+	# Find all style tags
+	style_tags = soup.find_all('style')
 
-    .input_prompt {
-        width: 10%;
-        white-space: nowrap;
-        min-width: fit-content;
-        margin-right: 1em;
-    }
+	# Initialize the target style_tag
+	target_style_tag = None
 
-    .border-box-sizing.code_cell.rendered {
-        width: 90%;
-    }
-    '''
+	# Iterate through all style tags to find the one containing 'div.prompt'
+	for style_tag in style_tags:
+		start = style_tag.string.find('div.prompt')
+		if start != -1:
+			target_style_tag = style_tag
+			break
 
-    style_tag = soup.new_tag('style')
-    style_tag.string = style_content
-    soup.head.append(style_tag)
+	if target_style_tag is not None:
+		# Find the positions of div.prompt rule in the target_style_tag
+		start = target_style_tag.string.find('div.prompt')
+		end = target_style_tag.string.find('}', start)
 
-    return soup
+		# Split at the target rule
+		first_part = target_style_tag.string[:start]
+		second_part = target_style_tag.string[end + 1:]
+
+		style_content = '''
+		.wrapper {
+			display: flex;
+			align-items: flex-start;
+		}
+
+		.input_prompt {
+			white-space: nowrap;
+			min-width: fit-content;
+			margin-right: 1em;
+		}
+
+		.border-box-sizing.code_cell.rendered {
+			width: 90%;
+		}
+		'''
+
+		# Remove the triple quotes and rebuild the style tag content
+		target_style_tag.string = first_part + style_content.strip() + second_part
+	else:
+		print("div.prompt not found in any style tags")
+	return soup
 
 # Create a clean feedback version of a file
 def clean_feedback(
@@ -492,7 +522,16 @@ def clean_feedback(
 		f"<body>{score_input}",
 		clean_text
 	)
+	
+	soup = BeautifulSoup(clean_text, 'html.parser')
 
+	target_div = soup.find('div', class_='col-sm-3', style='overflow: auto;')
+
+	if target_div is not None:
+		# Print the contents of the target div
+		print(target_div.contents)
+	else:
+		print("Specified div tag not found")
 	# Write the new cleaned file
 	with open(clean_path, "w") as clean_file:
 		clean_file.write(clean_text)
