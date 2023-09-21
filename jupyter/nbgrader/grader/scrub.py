@@ -546,7 +546,6 @@ if __name__ == "__main__":
 			"hiddenTracebackText": "Traceback Redacted"
 		}
 	kernel_language = kernel_language_raw.strip('"')
-	coursera_part_max_score = 100
 
 	clean_feedback(
 		nbgrader_learner, 

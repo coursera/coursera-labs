@@ -50,7 +50,7 @@ fi
 nbgrader autograde --assignment="$ASSIGNMENT_NAME" --notebook="$DECODED_SUBMISSION_FILENAME" --create --force # &> autograde.log
 
 # Generate the rich feedback for the assignment
-nbgrader generate_feedback "$ASSIGNMENT_NAME" &> feedback.log
+nbgrader generate_feedback "$ASSIGNMENT_NAME" 
 
 # Scrub given feedback file to remove hidden tests and tracebacks
 # Checks options.json for toggling on/off hiding tests or tracebacks
