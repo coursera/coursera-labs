@@ -163,7 +163,6 @@ def run_lab(manifest):
     print('*    Starting instance of {} listening on localhost:{}'.format(image_tag, exposed_port))
     print('*')
     print('*'*80)
-    print("HERE 1")
 
     command_parts = \
         [['docker', 'run']] + \
@@ -172,7 +171,6 @@ def run_lab(manifest):
         [['-e', var.name + '=' + var.value] for var in manifest.environment_vars] + \
         mount_commands + \
         [[image_tag]]
-    print("HERE 2")
     print('')
     print(' \\\n    '.join([' '.join(map(str, args)) for args in command_parts]))
     print('')

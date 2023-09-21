@@ -15,6 +15,7 @@ DECODED_SUBMISSION="$(echo -n $submitted_filename | python -c "import sys; from 
 ASSIGNMENT_NAME="$(echo -n $assign_dir | python -c "import sys; from urllib.parse import unquote; print(unquote(sys.stdin.read()));")"
 NOTEBOOK_FILENAME="$(echo -n $assign_file | python -c "import sys; from urllib.parse import unquote; print(unquote(sys.stdin.read()));")"
 DECODED_FEEDBACK="$(echo -n $feedback_filename | python -c "import sys; from urllib.parse import unquote; print(unquote(sys.stdin.read()));")"
+DECODED_SUBMISSION_FILENAME=${DECODED_SUBMISSION%.ipynb}
 
 NBGRADER_LEARNER="courseraLearner"
 
@@ -46,14 +47,10 @@ else
 fi
 
 # Autograde the submission with nbgrader
-nbgrader autograde --assignment="$ASSIGNMENT_NAME" --create --force &> autograde.log
-echo "Cat autograde"
-cat autograde.log
+nbgrader autograde --assignment="$ASSIGNMENT_NAME" --notebook="$DECODED_SUBMISSION_FILENAME" --create --force # &> autograde.log
 
 # Generate the rich feedback for the assignment
 nbgrader generate_feedback "$ASSIGNMENT_NAME" &> feedback.log
-echo "Cat feedback"
-cat feedback.log
 
 # Scrub given feedback file to remove hidden tests and tracebacks
 # Checks options.json for toggling on/off hiding tests or tracebacks

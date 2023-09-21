@@ -41,7 +41,6 @@ def extract_cell_number(soup):
 
 # Read file into string
 def get_feedback_text(file_path):
-    print(f"Validate path: {file_path}")
     with open(file_path, "r") as feedback_file:
         feedback_text = feedback_file.read()
         return feedback_text

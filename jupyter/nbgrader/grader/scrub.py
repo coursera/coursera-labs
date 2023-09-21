@@ -292,13 +292,6 @@ def round_numbers_in_fraction(match):
 def get_processed_feedback(processed_feedback, options, kernel_language):
 	testCaseResults = []
 	soup = BeautifulSoup(processed_feedback, 'html.parser')
-	
-	# Cell align
-	# style_tags = soup.find_all(lambda tag: tag.name == 'style' and not tag.has_attr('type'))
-	# for style_tag in style_tags:
-	# 	style_tag.string = style_tag.string.replace(
-	# 		"div.nbgrader_cell {\n    width: 100%;\n}",
-	# 		"div.nbgrader_cell {\n    width: 80%;\n 	display: inline-block\n}")
 
 	# Breaks HTML in chunks per cell
 	elements = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
@@ -306,8 +299,8 @@ def get_processed_feedback(processed_feedback, options, kernel_language):
 		new_soup = redact_feedback(element.contents, options, kernel_language, testCaseResults)
 		element.replace_with(new_soup)
 
-	
-	soup = apply_wrapper_on_all_cells(soup)
+	# Puts cell elements inside cell_wrapper to align cell numbers with Jupyter Lab format
+	soup = apply_cell_wrappers(soup)
 	redacted_feedback = str(soup)
 
 	# Get above accessibility contrast threshold
@@ -432,11 +425,9 @@ def wrap_cell_elements(soup, cell):
     cell.insert_before(input_prompt)
 
 
-def apply_wrapper_on_all_cells(soup):
-    # Locate the parent div with class="container" and id="notebook-container"
-    parent_div = soup.find('div', class_='container', id='notebook-container')
+def apply_cell_wrappers(soup):
 
-    # Iterate through all 'cell border-box-sizing code_cell rendered' elements and wrap them
+    # Iterate through all 'cell border-box-sizing code_cell rendered' elements and wrap them in .cell_wrapper
     cells = soup.find_all('div', class_='cell border-box-sizing code_cell rendered')
     for cell in cells:
         wrap_cell_elements(soup, cell)
@@ -448,6 +439,7 @@ def apply_wrapper_on_all_cells(soup):
     target_style_tag = None
 
     # Iterate through all style tags to find the one containing 'div.prompt'
+	# Needed to overwrite nbgrader defaults 
     for style_tag in style_tags:
         start = style_tag.string.find('div.prompt')
         if start != -1:
@@ -483,7 +475,7 @@ def apply_wrapper_on_all_cells(soup):
         # Remove the triple quotes and rebuild the style tag content
         target_style_tag.string = first_part + style_content.strip() + second_part
     else:
-        print("div.prompt not found in any style tags")
+        logging.warning("div.prompt not found in any style tags, nbgrader styling may have changed")
     return soup
 
 # Create a clean feedback version of a file
@@ -519,7 +511,6 @@ def clean_feedback(
 	# Write the new cleaned file
 	with open(clean_path, "w") as clean_file:
 		clean_file.write(clean_text)
-		print(f"Writing to :{clean_path}")
 
 	scoreCalculator(assignment_name, notebook_filename, nbgrader_learner, testCaseResults)
 
