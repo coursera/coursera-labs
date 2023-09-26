@@ -23,15 +23,16 @@ ENV ECLIPSE_VERSION="2022-12"
 ARG ECLIPSE_TYPE="jee"
 ARG ECLIPSE_RELEASE="R"
 ARG ECLIPSE_OS_BUILD="linux-gtk-x86_64"
-ARG ECLIPSE_MIRROR="http://mirror.math.princeton.edu"
+ARG ECLIPSE_MIRROR="https://download.eclipse.org"
 
 # tar name: eclipse-jee-2022-09-R-linux-gtk-x86_64.tar.gz
 ARG ECLIPSE_TAR="eclipse-${ECLIPSE_TYPE}-${ECLIPSE_VERSION}-${ECLIPSE_RELEASE}-${ECLIPSE_OS_BUILD}.tar.gz"
 
 # downloading from http://mirror.math.princeton.edu/pub/eclipse/technology/epp/downloads/release/2022-09/R/
-ARG ECLIPSE_DOWNLOAD_ROUTE="pub/eclipse/technology/epp/downloads/release/${ECLIPSE_VERSION}/${ECLIPSE_RELEASE}"
+ARG ECLIPSE_DOWNLOAD_ROUTE="technology/epp/downloads/release/${ECLIPSE_VERSION}/${ECLIPSE_RELEASE}"
 ARG ECLIPSE_DOWNLOAD_URL="${ECLIPSE_MIRROR}/${ECLIPSE_DOWNLOAD_ROUTE}"
 
+#intermittent failures
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
     && sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4EB27DB2A3B88B8B \
     && sudo apt-get update \
@@ -39,7 +40,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
 
 WORKDIR /opt
 RUN sudo wget -cq ${ECLIPSE_DOWNLOAD_URL}/${ECLIPSE_TAR} && \
-    sudo tar xf ${ECLIPSE_TAR} --no-same-owner && \
+sudo tar xf ${ECLIPSE_TAR} --no-same-owner && \
     sudo rm ${ECLIPSE_TAR}
 
 COPY eclipse.ini /opt/eclipse/eclipse.ini
@@ -69,7 +70,7 @@ RUN sudo usermod -a -G wireshark $USER \
 # Copy over resources for firefox launch page
 COPY firefox-launch-page/ /tmp/firefox-launch-page
 COPY syspref.js /etc/firefox/
-RUN sudo wget -O /tmp/Source_Sans_Pro.zip https://fonts.google.com/download?family=Source%20Sans%20Pro
+RUN sudo wget -O /tmp/Source_Sans_3.zip https://fonts.google.com/download?family=Source%20Sans%203
 
 # Allow for easier customization of filesystem, especially under mount point
 COPY vnc_startup.sh /dockerstartup/vnc_startup.sh
