@@ -48,6 +48,7 @@ COPY eclipse.ini /opt/eclipse/eclipse.ini
 RUN mkdir -p ${HOME}/.eclipse ${ECLIPSE_WORKSPACE} && \
     sudo chown -R ${USER}:${USER} ${HOME} ${HOME}/.eclipse ${ECLIPSE_WORKSPACE}
 
+
 # Download IntelliJ
 ARG INTELLIJ_MIRROR="https://download.jetbrains.com/idea"
 ARG INTELLIJ_TAR="ideaIC-2022.3.2.tar.gz"
@@ -81,6 +82,13 @@ RUN sudo chmod 644 /tmp/firefox-launch-page/* \
     && sudo chmod 644 /etc/firefox/syspref.js \
     && sudo chmod 777 /dockerstartup/vnc_startup.sh \
     && sudo chmod 777 /dockerstartup/coursera-start.sh
+
+RUN sudo apt update && sudo apt install -y traceroute dnsutils ettercap-common
+RUN sudo apt install -y whois snmpd zip tcpdump hping3
+RUN sudo apt-get install -y software-properties-common wget && sudo add-apt-repository universe 
+RUN sudo wget https://packages.ntop.org/apt-stable/18.04/all/apt-ntop-stable.deb \
+    && sudo apt install -y ./apt-ntop-stable.deb \
+    && sudo apt-get install -y ntopng
 
 # Explicitly start window manager
 # xfce4-session initializes the entire linux desktop session, so we want to 
