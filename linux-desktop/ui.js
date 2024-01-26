@@ -87,7 +87,7 @@ var UI = {
         UI.addTouchSpecificHandlers();
         // UI.addExtraKeysHandlers();
         UI.addMachineHandlers();
-        UI.addConnectionControlHandlers();
+        // UI.addConnectionControlHandlers();
         UI.addClipboardHandlers();
         UI.addSettingsHandlers();
         document.getElementById("noVNC_status")
