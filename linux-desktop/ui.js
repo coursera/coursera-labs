@@ -1029,7 +1029,7 @@ var UI = {
         UI.rfb.addEventListener("desktopname", UI.updateDesktopName);
         UI.rfb.clipViewport = UI.getSetting('view_clip');
         UI.rfb.scaleViewport = UI.getSetting('resize') === 'scale';
-        UI.rfb.resizeSession = UI.getSetting('resize') === 'remote';
+        UI.rfb.resizeSession = WebUtil.getConfigVar('resize', true);
 
         UI.updateViewOnly(); // requires UI.rfb
     },
