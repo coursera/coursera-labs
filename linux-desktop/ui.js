@@ -102,7 +102,7 @@ var UI = {
 
         document.documentElement.classList.remove("noVNC_loading");
 
-        var autoconnect = WebUtil.getConfigVar('autoconnect', false);
+        var autoconnect = WebUtil.getConfigVar('autoconnect', true);
         if (autoconnect === 'true' || autoconnect == '1') {
             autoconnect = true;
             UI.connect();
@@ -973,7 +973,7 @@ var UI = {
     },
 
     connect: function(event, password) {
-
+        password = "vncpassword"
         // Ignore when rfb already exists
         if (typeof UI.rfb !== 'undefined') {
             return;
