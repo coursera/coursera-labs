@@ -119,7 +119,7 @@ RUN mkdir -p ${HOME}/vscode/projects
 COPY --chown=${USER}:${USER} vnc_lite.html ${HOME}/noVNC/
 COPY --chown=${USER}:${USER} ui.js ${HOME}/noVNC/app
 COPY --chown=${USER}:${USER} vnc.html ${HOME}/noVNC/
-RUN ln -sf ${HOME}/noVNC/vnc_lite.html ${HOME}/noVNC/index.html
+RUN ln -sf ${HOME}/noVNC/vnc.html ${HOME}/noVNC/index.html
 
 # Configure Chromium to be the default browser
 RUN sudo update-alternatives --set x-www-browser /usr/bin/chromium-browser
