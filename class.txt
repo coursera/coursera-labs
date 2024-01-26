@@ -1,12 +1,15 @@
 Crimson
+PINK
 Orange
 Blue
 Cyan
 Yellow
+MAGENTA
 Charcoal
 Khaki
 Coral
 Silver
+CORAL
 Fuchsia
 Purple
 Brown
