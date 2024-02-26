@@ -116,9 +116,10 @@ RUN cp -r /home/developer/* /home/coder/ \
 
 RUN mkdir -p ${HOME}/vscode/projects
 
-COPY --chown=${USER}:${USER} vnc_lite.html ${HOME}/noVNC/
-COPY --chown=${USER}:${USER} ui.js ${HOME}/noVNC/app
-COPY --chown=${USER}:${USER} vnc.html ${HOME}/noVNC/
+COPY --chown=${USER}:${USER} vnc-files/ui.js ${HOME}/noVNC/app
+COPY --chown=${USER}:${USER} vnc-files/display.js ${HOME}/noVNC/core
+COPY --chown=${USER}:${USER} vnc-files/vnc.html ${HOME}/noVNC/
+COPY --chown=${USER}:${USER} vnc-files/rfb.js ${HOME}/noVNC/core
 RUN ln -sf ${HOME}/noVNC/vnc.html ${HOME}/noVNC/index.html
 
 # Configure Chromium to be the default browser

@@ -1,0 +1,16 @@
+<openbox_config>
+    <mouse>
+        <context name="Root">
+            <!--
+            <mousebind button="Right" action="Press">
+                <action name="ShowMenu">
+                    <menu>root-menu</menu>
+                </action>
+            </mousebind>
+            -->
+        </context>
+    </mouse>
+    <screensaver>
+        <enabled>no</enabled>
+    </screensaver>
+</openbox_config>

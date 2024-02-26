@@ -8,6 +8,7 @@
     Copyright (C) 2012 Joel Martin
     Copyright (C) 2016 Samuel Mannehed for Cendio AB
     Copyright (C) 2016 Pierre Ossman for Cendio AB
+    Copyright (C) 2024 Joseph Li for Coursera
     noVNC is licensed under the MPL 2.0 (see LICENSE.txt)
     This file is licensed under the 2-Clause BSD license (see LICENSE.txt).
 
@@ -107,10 +108,6 @@
 
                 <h1 class="noVNC_logo" translate="no"><span>no</span><br />VNC</h1>
 
-                <!-- Drag/Pan the viewport -->
-                <input type="image" alt="viewport drag" src="app/images/drag.svg" id="noVNC_view_drag_button"
-                    class="noVNC_button noVNC_hidden" title="Move/Drag Viewport" />
-
                 <!--noVNC Touch Device only buttons-->
                 <div id="noVNC_mobile_buttons">
                     <input type="image" alt="No mousebutton" src="app/images/mouse_none.svg" id="noVNC_mouse_button0"
@@ -124,32 +121,6 @@
                     <input type="image" alt="Keyboard" src="app/images/keyboard.svg" id="noVNC_keyboard_button"
                         class="noVNC_button" value="Keyboard" title="Show Keyboard" />
                 </div>
-
-                <!-- Extra manual keys -->
-                <!-- <div id="noVNC_extra_keys">
-                <input type="image" alt="Extra keys" src="app/images/toggleextrakeys.svg"
-                    id="noVNC_toggle_extra_keys_button" class="noVNC_button"
-                    title="Show Extra Keys"/>
-                <div class="noVNC_vcenter">
-                <div id="noVNC_modifiers" class="noVNC_panel">
-                    <input type="image" alt="Ctrl" src="app/images/ctrl.svg"
-                        id="noVNC_toggle_ctrl_button" class="noVNC_button"
-                        title="Toggle Ctrl"/>
-                    <input type="image" alt="Alt" src="app/images/alt.svg"
-                        id="noVNC_toggle_alt_button" class="noVNC_button"
-                        title="Toggle Alt"/>
-                    <input type="image" alt="Tab" src="app/images/tab.svg"
-                        id="noVNC_send_tab_button" class="noVNC_button"
-                        title="Send Tab"/>
-                    <input type="image" alt="Esc" src="app/images/esc.svg"
-                        id="noVNC_send_esc_button" class="noVNC_button"
-                        title="Send Escape"/>
-                    <input type="image" alt="Ctrl+Alt+Del" src="app/images/ctrlaltdel.svg"
-                        id="noVNC_send_ctrl_alt_del_button" class="noVNC_button"
-                        title="Send Ctrl-Alt-Del" />
-                </div>
-                </div>
-            </div> -->
 
                 <!-- Shutdown/Reboot -->
                 <input type="image" alt="Shutdown/Reboot" src="app/images/power.svg" id="noVNC_power_button"
@@ -179,11 +150,7 @@
                     </div>
                 </div>
 
-                <!-- Toggle fullscreen -->
-                <input type="image" alt="Fullscreen" src="app/images/fullscreen.svg" id="noVNC_fullscreen_button"
-                    class="noVNC_button noVNC_hidden" title="Fullscreen" />
-
-                <!-- Settings -->
+                <!-- Settings; hidden instead of deleted because this is coupled closely with ui.js -->
                 <input type="image" alt="Settings" src="app/images/settings.svg" id="noVNC_settings_button"
                     class="noVNC_button noVNC_hidden" title="Settings" />
                 <div class="noVNC_vcenter">
@@ -273,11 +240,6 @@
                         </ul>
                     </div>
                 </div>
-
-                <!-- Connection Controls -->
-                <!-- <input type="image" alt="Disconnect" src="app/images/disconnect.svg" id="noVNC_disconnect_button"
-                    class="noVNC_button" title="Disconnect" /> -->
-
             </div>
         </div>
 

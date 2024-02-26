@@ -1,0 +1,9 @@
+{
+  "name": "base/virtual-browser",
+  "httpPort": 6901,
+  "mounts": [
+    {
+      "path": "/home/coder/coursera"
+    }
+  ]
+}
