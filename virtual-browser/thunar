@@ -1,0 +1,3 @@
+#!/bin/bash
+#Opens files in Chromium file manager
+/usr/bin/chromium-browser "$1"

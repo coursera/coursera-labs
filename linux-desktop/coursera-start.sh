@@ -20,3 +20,6 @@ ln -s /home/coder/coursera/.coursera-dotfiles/.userPrefs/ /home/coder/.java/.use
 mkdir -p /home/coder/coursera/.coursera-dotfiles/.config/JetBrains
 ln -s /home/coder/coursera/.coursera-dotfiles/.config/JetBrains /home/coder/.config/JetBrains
 
+# Persist VSCode files
+mkdir -p /home/coder/coursera/vscode/projects
+ln -s /home/coder/coursera/vscode/projects /home/coder/vscode/projects

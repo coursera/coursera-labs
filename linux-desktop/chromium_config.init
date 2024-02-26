@@ -1,0 +1,1 @@
+CHROMIUM_FLAGS='--no-sandbox --disable-gpu --user-data-dir --window-position=0,0 --disable-software-rasterizer --disable-dev-shm-usage --noerrdialogs --disable-infobars --suppress-message-center-popups --test-type'
