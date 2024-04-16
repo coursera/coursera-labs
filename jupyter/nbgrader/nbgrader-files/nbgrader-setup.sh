@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Delete grader files
-rm -rf $GRADER_FILES_PATH
-
 if [ "${WORKSPACE_TYPE}" = "student" ]
 then
+	# Delete grader files
+	rm -rf $GRADER_FILES_PATH
+	
 	# Keep only validate extension for students
     jupyter nbextension disable --sys-prefix create_assignment/main
     jupyter nbextension disable --sys-prefix formgrader/main --section=tree

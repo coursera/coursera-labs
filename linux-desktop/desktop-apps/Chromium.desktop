@@ -3,8 +3,8 @@ Version=1.0
 Type=Application
 Name=Chromium Web Browser
 Comment=Web Browser
-Exec=/usr/bin/chromium-browser %U
-Icon=google-chrome
+Exec=/usr/bin/chromium --no-sandbox --disable-gpu --user-data-dir --window-position=0,0 --disable-software-rasterizer --disable-dev-shm-usage --noerrdialogs --disable-infobars --suppress-message-center-popups --test-type %U
+Icon=chromium
 Path=/home/coder
 Terminal=false
 StartupNotify=true
