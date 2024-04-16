@@ -1,0 +1,41 @@
+# # Basic packages
+# future
+# pkgconfig
+# httpie
+# hyperopt
+# ipaddress
+# pyparsing
+# requests
+# j2cli
+# jinja2
+# hyperopt
+# json-lines
+# python-git
+# PyYAML
+# yml2json
+# python-dateutil
+
+# # Math / Algebra Libs
+numpy
+# panda
+# pandas
+# pandasql
+# Pillow
+# scikit_learn
+# scipy
+
+# # Plots
+# matplotlib
+# seaborn
+# pyLDAvis
+# pydot
+# networkx
+
+# # Virtual env
+virtualenv
+virtualenvwrapper
+
+# # Jypyter
+# ipykernel
+# jupyter
+
