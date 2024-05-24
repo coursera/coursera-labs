@@ -34,7 +34,8 @@ class Manifest(object):
         self.version = data.get('version', None)
         self.http_port = data.get('httpPort')
         self.mounts = [ManifestMount(mountData) for mountData in data.get('mounts', [])]
-        self.environment_vars = [ManifestEnvVariable(mountData) for mountData in data.get('environmentVars', [])]
+        self.environment_vars = [ManifestEnvVariable(envVar) for envVar in data.get('environmentVars', [])]
+        self.additional_run_params = [ManifestAddRunParams(addRunParam) for addRunParam in data.get('additionalRunParams', [])]
 
     @property
     def image_tag(self):
@@ -52,6 +53,12 @@ class ManifestMount(object):
 class ManifestEnvVariable(object):
     def __init__(self, data):
         self.name = data.get('name')
+        self.value = str(data.get('value'))
+
+
+class ManifestAddRunParams(object):
+    def __init__(self, data):
+        self.param = data.get('param')
         self.value = str(data.get('value'))
 
 
@@ -157,6 +164,7 @@ def run_lab(manifest):
     image_tag = manifest.image_tag
     name = manifest.name.replace('/', '_') + '-' + str(exposed_port)
     mount_commands = prompt_for_mounts(manifest)
+    additional_params = get_additional_run_params(manifest)
 
     print('*'*80)
     print('*')
@@ -170,6 +178,7 @@ def run_lab(manifest):
         [['-p', exposed_port + ':' + str(manifest.http_port)]] + \
         [['-e', var.name + '=' + var.value] for var in manifest.environment_vars] + \
         mount_commands + \
+        additional_params + \
         [[image_tag]]
 
     print('')
@@ -182,6 +191,20 @@ def run_lab(manifest):
         subprocess.call(command)
     except KeyboardInterrupt as e:
         subprocess.call(['docker', 'stop', name])
+
+def get_additional_run_params(manifest):
+    '''
+    Consider additional docker run parameters, as specified in manifest.json
+
+    Returns a list of additional run params
+    '''
+    add_run_params = []
+    for param in manifest.additional_run_params:
+        add_param = [param.param]
+        if param.value != "":
+            add_param.append(param.value)
+        add_run_params.append(add_param)
+    return add_run_params
 
 
 def prompt_for_mounts(manifest):
