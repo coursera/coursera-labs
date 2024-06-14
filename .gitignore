@@ -3,4 +3,4 @@ generated/
 *.DS_Store
 *.zip
 node_modules
-scrub.py
+*scrub.py
