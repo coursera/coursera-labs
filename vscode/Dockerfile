@@ -106,11 +106,6 @@ RUN groupadd -r coder \
     && echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/nopasswd
 USER coder
 
-# Install conda
-RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
-    && bash ~/miniconda.sh -b -p /home/coder/miniconda
-ENV PATH "${PATH}:/home/coder/miniconda/bin"
-
 # Set up User Go Environment
 RUN mkdir /home/coder/go
 ENV GOPATH "/home/coder/go"
